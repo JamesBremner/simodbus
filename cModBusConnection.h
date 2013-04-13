@@ -1,5 +1,8 @@
 #pragma once
 
+/**
+	Simulate a modbus device or master
+*/
 class cModBusConnection
 {
 public:
@@ -8,13 +11,14 @@ public:
 	~cModBusConnection(void);
 	void SendQueryRead( int Station, int Register );
 	std::string getMessageSent()			{ return myHumanReadableMessage; }
-	std::string getReply()					{ return myHumanReadableReply; }
+	std::string getReply();
 	float getValue()							{ return myValue; }
 	int Connect();
 	int Slave();
 	void setCOMPort( int i )				{ myCOMPort = i; }
 	int Poll();
-	char * getData()						{ return (char*)myBuffer; /*"test\n\r"; */}
+
+	char * getData()						{ return (char*)myBuffer; }
 	void setSerial()						{ flagTCP = false; }
 	void setTCP()							{ flagTCP = true; }
 	bool IsSerial()							{ return ( flagTCP == false ); }

@@ -418,22 +418,22 @@ namespace simodbus {
 			// rbRTU
 			// 
 			this->rbRTU->AutoSize = true;
+			this->rbRTU->Checked = true;
 			this->rbRTU->Location = System::Drawing::Point(21, 49);
 			this->rbRTU->Name = L"rbRTU";
 			this->rbRTU->Size = System::Drawing::Size(48, 17);
 			this->rbRTU->TabIndex = 1;
+			this->rbRTU->TabStop = true;
 			this->rbRTU->Text = L"RTU";
 			this->rbRTU->UseVisualStyleBackColor = true;
 			// 
 			// rbASCII
 			// 
 			this->rbASCII->AutoSize = true;
-			this->rbASCII->Checked = true;
 			this->rbASCII->Location = System::Drawing::Point(21, 22);
 			this->rbASCII->Name = L"rbASCII";
 			this->rbASCII->Size = System::Drawing::Size(52, 17);
 			this->rbASCII->TabIndex = 0;
-			this->rbASCII->TabStop = true;
 			this->rbASCII->Text = L"ASCII";
 			this->rbASCII->UseVisualStyleBackColor = true;
 			// 
@@ -522,16 +522,7 @@ namespace simodbus {
 				 theModBusConnection.SendQueryRead(
 					 Convert::ToInt32(Station->Text),
 					 Convert::ToInt32(Register->Text) );
-				 int start = logWindow->Text->Length;
-				 logWindow->AppendText( gcnew String( theModBusConnection.getMessageSent().c_str() ) );
-				 logWindow->SelectionStart = start;
-				 logWindow->SelectionLength = logWindow->Text->Length - start - 1;
-				 logWindow->SelectionColor  = Color::Green;
-				 start = logWindow->Text->Length;
-				 logWindow->AppendText( gcnew String( theModBusConnection.getReply().c_str() ) );
-				 logWindow->SelectionStart = start;
-				 logWindow->SelectionLength = logWindow->Text->Length - start - 1;
-				 logWindow->SelectionColor  = Color::Red;
+				 DisplayMessageAndReply();
 				 Value->Text = theModBusConnection.getValue().ToString();
 
 
@@ -542,7 +533,11 @@ namespace simodbus {
 				 dataGridView1->Rows->Add( row );
 
 			 }
+/**
 
+  Time for slave simulator to check for input from master
+
+*/
 private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
 
 			 int ret = theModBusConnection.Poll();
@@ -550,9 +545,8 @@ private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e
 				 // there was no message
 				 return;
 			 }
+			 DisplayMessageAndReply();
 
-			 String^ msg = gcnew String(  theModBusConnection.getMessageSent().c_str() );
-			 logWindow->Text += msg;
 		 }
 		 /**
 
@@ -610,6 +604,21 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 			 }
 
 		 }
+public:
+
+	void DisplayMessageAndReply(void)
+	{
+		int start = logWindow->Text->Length;
+		logWindow->AppendText( gcnew String( theModBusConnection.getMessageSent().c_str() ) );
+		logWindow->SelectionStart = start;
+		logWindow->SelectionLength = logWindow->Text->Length - start - 1;
+		logWindow->SelectionColor  = Color::Green;
+		start = logWindow->Text->Length;
+		logWindow->AppendText( gcnew String( theModBusConnection.getReply().c_str() ) );
+		logWindow->SelectionStart = start;
+		logWindow->SelectionLength = logWindow->Text->Length - start - 1;
+		logWindow->SelectionColor  = Color::Red;
+	}
 };
 }
 

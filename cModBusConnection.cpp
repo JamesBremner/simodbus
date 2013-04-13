@@ -112,6 +112,14 @@ cModBusConnection::cModBusConnection(void)
 cModBusConnection::~cModBusConnection(void)
 {
 }
+/**
+
+  Send a read query
+
+  @param[in] Station
+  @param[in] Register
+
+*/
 void cModBusConnection::SendQueryRead( int Station, int Register )
 {
 	unsigned char buf[1000];
@@ -196,6 +204,15 @@ std::string cModBusConnection::MakeHumanReadable( unsigned char * msg, int len )
 	readable += "\r\n";
 	return readable;
 }
+std::string cModBusConnection::getReply()
+{
+	if( myHumanReadableReply.length() ) {
+		return myHumanReadableReply;
+	} else {
+		return std::string("No reply\n");
+	}
+}
+
 /**
 
   Connect to socket communicating with MODBUS stations
@@ -353,17 +370,43 @@ int cModBusConnection::Poll()
 		// check LRC
 		// don't include framing and master LRC
 		unsigned char lrc = LongitudinalRedundancyCheck( &myBuffer[1], len-5 );
-		if( (lrc & 0xF) != myBuffer[10] || (lrc >> 4) != myBuffer[9] )
+		if( (lrc & 0xF) != myBuffer[10] || (lrc >> 4) != myBuffer[9] ) {
+			
 			return 4;
+		}
 
 	} else {
 
 		// RTU mode
 
 		unsigned short crc = CyclicalRedundancyCheck( myBuffer, 6 );
-		if( ( crc >> 8  ) != myBuffer[7] && ( crc & 0xFF ) != myBuffer[6] )
+		if( ( crc >> 8  ) != myBuffer[6] && ( crc & 0xFF ) != myBuffer[7] ) {
+			myHumanReadableReply = "CRC ERROR\n";
 			return 4;
+		}
+
+		int cmd = myBuffer[1];
+
+		// accept either a input or holding register read
+		// return same for both
+		if( cmd == 3 || cmd == 4 ) {
+
+			// for any read command
+			// return just one value = 0
+			myBuffer[2] = 2;
+			myBuffer[3] = 0;
+			myBuffer[4] = 0;
+			len = 5;
+			unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
+			myBuffer[6] = crc >> 8;
+			myBuffer[5] = 0xFF & crc;
+			len = 7;
+
+
+		}
+
 	}
+	myHumanReadableReply = MakeHumanReadable(myBuffer,len);
 	mySerial.SendData(myBuffer,len);
 
 	return 0;
