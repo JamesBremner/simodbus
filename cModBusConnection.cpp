@@ -386,21 +386,24 @@ int cModBusConnection::Poll()
 		}
 
 		int cmd = myBuffer[1];
+		int block = myBuffer[5];
 
 		// accept either a input or holding register read
 		// return same for both
 		if( cmd == 3 || cmd == 4 ) {
 
 			// for any read command
-			// return just one value = 0
-			myBuffer[2] = 2;
-			myBuffer[3] = 0;
-			myBuffer[4] = 0;
-			len = 5;
+			// return just one value = 1
+			myBuffer[2] = 2 * block;
+			for( int kr = 0; kr < block; kr++ ) {
+				myBuffer[3+kr*2] = 0;
+				myBuffer[4+kr*2] = 1;
+			}
+			len = 3 + 2 * block;
 			unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
-			myBuffer[6] = crc >> 8;
-			myBuffer[5] = 0xFF & crc;
-			len = 7;
+			myBuffer[5] = crc >> 8;
+			myBuffer[6] = 0xFF & crc;
+			len += 2;
 
 
 		}
