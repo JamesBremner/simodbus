@@ -494,7 +494,7 @@ namespace simodbus {
 				 if( dlg->Slave->Checked ) {
 					 // we want to simulate the slaves
 					 this->Text = "Simodbus ( Slave )";
-					 if( theModBusConnection.Slave() ) {
+					 if( theModBusSim.Slave() ) {
 						toolStripStatusLabel1->Text = "Failed to start station simulator";
 						 return;
 					 }
@@ -509,7 +509,7 @@ namespace simodbus {
 					 // master simulation
 					 this->Text = "Simodbus ( Master )";
 
-					 theModBusConnection.Connect();
+					 theModBusSim.Connect();
 				 }
 			 }
 			 /**
@@ -519,11 +519,11 @@ namespace simodbus {
 			 */
 	private: System::Void Read_Click(System::Object^  sender, System::EventArgs^  e) {
 
-				 theModBusConnection.SendQueryRead(
+				 theModBusSim.SendQueryRead(
 					 Convert::ToInt32(Station->Text),
 					 Convert::ToInt32(Register->Text) );
 				 DisplayMessageAndReply();
-				 Value->Text = theModBusConnection.getValue().ToString();
+				 Value->Text = theModBusSim.getValue().ToString();
 
 
 				 array<String^>^ row = gcnew array<String^>(3);
@@ -540,7 +540,7 @@ namespace simodbus {
 */
 private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
 
-			 int ret = theModBusConnection.Poll();
+			 int ret = theModBusSim.Poll();
 			 if( ret == 1 || ret == 2 ) {
 				 // there was no message
 				 return;
@@ -563,24 +563,24 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 				 return;
 			 }
 			 if( rbSERIAL->Checked ) {
-				 theModBusConnection.setSerial();
+				 theModBusSim.setSerial();
 				 int p = -1;
 				 Int32::TryParse( COMPort->Text, p );
-				 theModBusConnection.setCOMPort( p );
+				 theModBusSim.setCOMPort( p );
 			 } else if ( rbTCP->Checked ) {
-				 theModBusConnection.setTCP();
+				 theModBusSim.setTCP();
 			 } else {
 				 toolStripStatusLabel1->Text = "Please select TCP or Serial";
 				 return;
 			 }
 			 if( rbRTU->Checked ) {
-				theModBusConnection.setRTU();
+				theModBusSim.setRTU();
 			 } else {
-				 theModBusConnection.setASCII();
+				 theModBusSim.setASCII();
 			 }
 
 			 // Attempt connection
-			 if( theModBusConnection.Connect() != OK ) {
+			 if( theModBusSim.Connect() != OK ) {
 				 toolStripStatusLabel1->Text = "Connection Failed";
 				 return;
 			 }
@@ -595,7 +595,7 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 			 rbMASTER->Enabled		= false;
 
 			 if( rbSTATIONS->Checked ) {
-				 if( theModBusConnection.IsSerial() ) {
+				 if( theModBusSim.IsSerial() ) {
 					 // start timer for serial slave server
 					 timer1->Interval = 1000;
 					 timer1->Enabled = true;
@@ -609,12 +609,12 @@ public:
 	void DisplayMessageAndReply(void)
 	{
 		int start = logWindow->Text->Length;
-		logWindow->AppendText( gcnew String( theModBusConnection.getMessageSent().c_str() ) );
+		logWindow->AppendText( gcnew String( theModBusSim.getMessageSent().c_str() ) );
 		logWindow->SelectionStart = start;
 		logWindow->SelectionLength = logWindow->Text->Length - start - 1;
 		logWindow->SelectionColor  = Color::Green;
 		start = logWindow->Text->Length;
-		logWindow->AppendText( gcnew String( theModBusConnection.getReply().c_str() ) );
+		logWindow->AppendText( gcnew String( theModBusSim.getReply().c_str() ) );
 		logWindow->SelectionStart = start;
 		logWindow->SelectionLength = logWindow->Text->Length - start - 1;
 		logWindow->SelectionColor  = Color::Red;

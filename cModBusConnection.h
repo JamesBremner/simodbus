@@ -1,42 +1,114 @@
 #pragma once
 
-/**
-	Simulate a modbus device or master
-*/
-class cModBusConnection
+class cConnectionBase
 {
+	protected:
+	enum connection_type {
+		none,
+		serial,
+		tcp
+	} myType;
+	bool flagRTU;
+
+
 public:
+	cConnectionBase()
+		: myType( none )
+		, flagRTU( true )
+	{}
+	cConnectionBase( connection_type t )
+		: myType( t )
+		, flagRTU( true )
+	{}
 
-	cModBusConnection(void);
-	~cModBusConnection(void);
-	void SendQueryRead( int Station, int Register );
-	std::string getMessageSent()			{ return myHumanReadableMessage; }
-	std::string getReply();
-	float getValue()							{ return myValue; }
-	int Connect();
-	int Slave();
-	void setCOMPort( int i )				{ myCOMPort = i; }
-	int Poll();
+	virtual int Connect()					{ return 1; }		///< No connection from base class
+	virtual bool IsOpened()					{ return false; }	///< base class cannot be opened
+	virtual int SendData
+		( const unsigned char *buffer, int size )
+											{ return 0; }		///< base class cannot send data
+	int WaitForData( int len, int msec )	{ return 0; }		///< base class always times out
+	int ReadData( void *, int )				{ return 0; }		///< base class connot read data
+	int ReadDataWaiting( void )				{ return 0; }		///< never any data on base class
 
-	char * getData()						{ return (char*)myBuffer; }
-	void setSerial()						{ flagTCP = false; }
-	void setTCP()							{ flagTCP = true; }
-	bool IsSerial()							{ return ( flagTCP == false ); }
+	void setSerial()						{ myType = serial; }
+	void setTCP()							{ myType = tcp; }
+	void setCOMPort( int i )				{ }
+
+	bool IsSerial()							{ return ( myType == serial ); }
+	bool IsTCP()							{ return ( myType == tcp ); }
 
 	void setASCII()							{ flagRTU = false; }
 	void setRTU()							{ flagRTU = true; }
+	bool IsRTU()							{ return flagRTU; }
+
+
+};
+
+class cConnectionTCP : public cConnectionBase
+{
+private:
+	SOCKET ConnectSocket;
+};
+class cConnectionSerial : public cConnectionBase
+{
+public:
+	cConnectionSerial()
+		: cConnectionBase( serial )
+		, myCOMPort( -1 )
+	{}
+	int Connect();
+	virtual bool IsOpened()					{ return mySerial.IsOpened(); }
+	int WaitForData( int len, int msec )	{ return mySerial.WaitForData( len, msec ); }
+	int ReadData( void * msg, int len )		{ return mySerial.ReadData( msg, len ); }
+	int ReadDataWaiting( void )				{ return mySerial.ReadDataWaiting(); }
+
+	void setCOMPort( int i )				{ myCOMPort = i; }
+private:
+	raven::cSerial mySerial;
+	int myCOMPort;
+
+};
+
+/**
+	Simulate a modbus device or master
+*/
+class cModBusSim
+{
+public:
+
+	cModBusSim(void);
+	~cModBusSim(void);
+
+	int Connect()				{ return myConnection->Connect(); }
+	void setSerial();
+	void setTCP();
+	bool IsSerial()				{ return myConnection->IsSerial(); }
+	bool IsTCP()				{ return myConnection->IsTCP(); }
+
+	void SendQueryRead( int Station, int Register );
+	std::string getMessageSent()			{ return myHumanReadableMessage; }
+	std::string getReply();
+	float getValue()						{ return myValue; }
+	
+	int Slave();
+	
+	int Poll();
+
+	char * getData()						{ return (char*)myBuffer; }
+
+
+	void setCOMPort( int i )				{ myConnection->setCOMPort( i ); }
+	void setASCII()							{ myConnection->setASCII(); }
+	void setRTU()							{ myConnection->setRTU(); }
+	bool IsRTU()							{ return myConnection->IsRTU(); }
 
 private:
 	std::string myHumanReadableMessage;
 	std::string myHumanReadableReply;
 	float myValue;
-	SOCKET ConnectSocket;
-	int myCOMPort;
-	raven::cSerial mySerial;
 	unsigned char myBuffer[100];
-	bool flagRTU;
-	bool flagTCP;
-
+	
+	cConnectionBase * myConnection;
 
 	void Server();
 	std::string MakeHumanReadable( unsigned char * msg, int len );
@@ -46,4 +118,4 @@ private:
 		unsigned char * msg, int len );
 };
 
-extern cModBusConnection theModBusConnection;
+extern cModBusSim theModBusSim;

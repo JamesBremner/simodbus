@@ -3,7 +3,7 @@
 
 #include "cModBusConnection.h"
 
-cModBusConnection theModBusConnection;
+cModBusSim theModBusSim;
 
 
 /*
@@ -102,16 +102,31 @@ private:
 
 */
 
-cModBusConnection::cModBusConnection(void)
-: myCOMPort( -1 )
-, flagRTU( false )
+cModBusSim::cModBusSim(void)
+: myConnection( new cConnectionBase )
 {
 
 }
 
-cModBusConnection::~cModBusConnection(void)
+cModBusSim::~cModBusSim(void)
 {
 }
+
+void cModBusSim::setSerial()
+{
+	if( myConnection->IsSerial() )
+		return;
+	delete myConnection;
+	myConnection = new cConnectionSerial();
+}
+void cModBusSim::setTCP()
+{
+	if( myConnection->IsTCP() )
+		return;
+	delete myConnection;
+	myConnection = new cConnectionTCP;
+}
+
 /**
 
   Send a read query
@@ -120,11 +135,11 @@ cModBusConnection::~cModBusConnection(void)
   @param[in] Register
 
 */
-void cModBusConnection::SendQueryRead( int Station, int Register )
+void cModBusSim::SendQueryRead( int Station, int Register )
 {
 	unsigned char buf[1000];
 	int msglen;
-	if( flagRTU ) {
+	if( IsRTU() ) {
 		buf[0] = Station;
 		buf[1] = 4;
 		buf[2] = 0;				// max register 255
@@ -153,25 +168,27 @@ void cModBusConnection::SendQueryRead( int Station, int Register )
 		msglen = 13;
 	}
 	myHumanReadableMessage = MakeHumanReadable( buf,msglen);
-	if( flagTCP ) {
-		int iResult = send(ConnectSocket,(const char *)buf,msglen, 0 );
-		if (iResult == SOCKET_ERROR) {
-			iResult = WSAGetLastError();
-			printf("send failed: %d\n", WSAGetLastError());
-		}
-	} else {
-		mySerial.SendData( 
+
+	myConnection->SendData( 
 			(const unsigned char *)buf,
 			msglen );
+
+	//if( flagTCP ) {
+	//	int iResult = send(ConnectSocket,(const char *)buf,msglen, 0 );
+	//	if (iResult == SOCKET_ERROR) {
+	//		iResult = WSAGetLastError();
+	//		printf("send failed: %d\n", WSAGetLastError());
+	//	}
+	//} else {
 		Sleep(300);
-		if( !mySerial.WaitForData(
+		if( ! myConnection->WaitForData(
 			7,
 			6000 ) ) {
 				myHumanReadableReply = "timed out\r\n";
 			return;
 		}
 		memset(buf,'\0',100);
-		msglen = mySerial.ReadData(
+		msglen = myConnection->ReadData(
 			buf,
 			999);
 		myHumanReadableReply = MakeHumanReadable(buf,msglen);
@@ -189,11 +206,11 @@ void cModBusConnection::SendQueryRead( int Station, int Register )
 			iv -= 32767;
 		myValue = iv / 1000.0f;
 
-	}
+	
 
 }
 
-std::string cModBusConnection::MakeHumanReadable( unsigned char * msg, int len )
+std::string cModBusSim::MakeHumanReadable( unsigned char * msg, int len )
 {
 	std::string readable;
 	char charbuf[10];
@@ -204,7 +221,7 @@ std::string cModBusConnection::MakeHumanReadable( unsigned char * msg, int len )
 	readable += "\r\n";
 	return readable;
 }
-std::string cModBusConnection::getReply()
+std::string cModBusSim::getReply()
 {
 	if( myHumanReadableReply.length() ) {
 		return myHumanReadableReply;
@@ -220,62 +237,100 @@ std::string cModBusConnection::getReply()
   @return 0 if no errors
 
 */
-int cModBusConnection::Connect()
+//int cModBusConnection::Connect()
+//{
+//	if( flagTCP ) {
+//
+//	//-------------------------------
+//	// Initialize socket library
+//	WORD wVersionRequested;
+//	WSADATA wsaData;
+//	wVersionRequested = MAKEWORD( 2, 2 );
+//	WSAStartup( wVersionRequested, &wsaData );
+//
+//	//--------------------------------
+//	// Declare and initialize variables.
+//	char* ip = "127.0.0.1";
+//	char* port = "27015";
+//	struct addrinfo aiHints;
+//	struct addrinfo *aiList = NULL;
+//	int retVal;
+//
+//	//--------------------------------
+//	// Setup the hints address info structure
+//	// which is passed to the getaddrinfo() function
+//	memset(&aiHints, 0, sizeof(aiHints));
+//	aiHints.ai_family = AF_INET;
+//	aiHints.ai_socktype = SOCK_STREAM;
+//	aiHints.ai_protocol = IPPROTO_TCP;
+//
+//	//--------------------------------
+//	// Call getaddrinfo(). If the call succeeds,
+//	// the aiList variable will hold a linked list
+//	// of addrinfo structures containing response
+//	// information about the host
+//	if ((retVal = getaddrinfo(ip, port, &aiHints, &aiList)) != 0) {
+//		printf("getaddrinfo() failed.\n");
+//		return 1;
+//	}
+//
+//	//--------------------------------
+//	// Connect to socket
+//	ConnectSocket = INVALID_SOCKET;
+//	struct addrinfo *ptr;
+//	ptr = aiList;
+//	ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, 
+//		ptr->ai_protocol);
+//	if (ConnectSocket == INVALID_SOCKET) {
+//		printf("Error at socket(): %ld\n", WSAGetLastError());
+//		return 1;
+//	}
+//	if( connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen) ) {
+//		printf("Error at socket(): %ld\n", WSAGetLastError());
+//		return 1;
+//	}
+//
+//	return 0;
+//
+//	} else {
+//		if( myCOMPort < 1 )
+//			return 1;
+//		char szPort[100];
+//		sprintf_s(szPort,99,"COM%d",myCOMPort);
+//
+//		/*
+//		Configure connection according to MODBUS mode
+//		*/
+//		if( ! flagRTU ) {
+//			mySerial.SetParity(0);
+//			mySerial.SetByteSize(7);
+//			mySerial.SetStopBits(TWOSTOPBITS);
+//		} else {
+//			mySerial.SetParity(0);
+//			mySerial.SetByteSize(8);
+//			mySerial.SetStopBits(ONESTOPBIT);
+//		}
+//
+//		/*
+//		Open connection
+//		*/
+//		if( ! mySerial.Open( szPort ) )
+//			return 1;
+//
+//		return 0;
+//	}
+//	// should never come here
+//	return 1;
+//}
+/**
+
+  Connect to serial port communicating with MODBUS stations
+
+  @return 0 if no errors
+
+*/
+int cConnectionSerial::Connect()
 {
-	if( flagTCP ) {
-
-	//-------------------------------
-	// Initialize socket library
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	wVersionRequested = MAKEWORD( 2, 2 );
-	WSAStartup( wVersionRequested, &wsaData );
-
-	//--------------------------------
-	// Declare and initialize variables.
-	char* ip = "127.0.0.1";
-	char* port = "27015";
-	struct addrinfo aiHints;
-	struct addrinfo *aiList = NULL;
-	int retVal;
-
-	//--------------------------------
-	// Setup the hints address info structure
-	// which is passed to the getaddrinfo() function
-	memset(&aiHints, 0, sizeof(aiHints));
-	aiHints.ai_family = AF_INET;
-	aiHints.ai_socktype = SOCK_STREAM;
-	aiHints.ai_protocol = IPPROTO_TCP;
-
-	//--------------------------------
-	// Call getaddrinfo(). If the call succeeds,
-	// the aiList variable will hold a linked list
-	// of addrinfo structures containing response
-	// information about the host
-	if ((retVal = getaddrinfo(ip, port, &aiHints, &aiList)) != 0) {
-		printf("getaddrinfo() failed.\n");
-		return 1;
-	}
-
-	//--------------------------------
-	// Connect to socket
-	ConnectSocket = INVALID_SOCKET;
-	struct addrinfo *ptr;
-	ptr = aiList;
-	ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, 
-		ptr->ai_protocol);
-	if (ConnectSocket == INVALID_SOCKET) {
-		printf("Error at socket(): %ld\n", WSAGetLastError());
-		return 1;
-	}
-	if( connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen) ) {
-		printf("Error at socket(): %ld\n", WSAGetLastError());
-		return 1;
-	}
-
-	return 0;
-
-	} else {
 		if( myCOMPort < 1 )
 			return 1;
 		char szPort[100];
@@ -301,35 +356,29 @@ int cModBusConnection::Connect()
 			return 1;
 
 		return 0;
-	}
-	// should never come here
-	return 1;
+
 }
 /**
 
   Start simulating the stations
 
+  return 0 if no errors
+
 */
-int cModBusConnection::Slave()
+int cModBusSim::Slave()
 {
-	if( flagTCP ) {
+	if( IsTCP() ) {
 		// start the station scoket server
 		return 1;
 
 	} else {
-		if( myCOMPort < 1 )
-			return 1;
-		char szPort[100];
-		sprintf_s(szPort,99,"COM%d",myCOMPort);
-		if( ! mySerial.Open( szPort ) )
-			return 1;
 
-		return 0;
+		return myConnection->Connect();
 
 	}
 
 }
-void cModBusConnection::Server()
+void cModBusSim::Server()
 {
 	//boost::asio::io_service io_service;
 	//cModbusSlaveServer server(io_service);
@@ -345,19 +394,19 @@ void cModBusConnection::Server()
   return 0 if good message received
 
 */
-int cModBusConnection::Poll()
+int cModBusSim::Poll()
 {
-	if( flagTCP )
+	if( IsTCP() )
 		return 1;
-	if( ! mySerial.IsOpened() )
+	if( ! myConnection->IsOpened() )
 		return 1;
-	if( ! mySerial.ReadDataWaiting() )
+	if( ! myConnection->ReadDataWaiting() )
 		return 2;
-	int len = mySerial.ReadData(myBuffer,99);
+	int len = myConnection->ReadData(myBuffer,99);
 
 	myHumanReadableMessage = MakeHumanReadable( myBuffer, len );
 
-	if( ! flagRTU ) {
+	if( ! IsRTU() ) {
 
 		// check framing
 		if( (char)myBuffer[0] != ':' )
@@ -410,7 +459,7 @@ int cModBusConnection::Poll()
 
 	}
 	myHumanReadableReply = MakeHumanReadable(myBuffer,len);
-	mySerial.SendData(myBuffer,len);
+	myConnection->SendData(myBuffer,len);
 
 	return 0;
 }
@@ -438,7 +487,7 @@ When the the 8–bit LRC (2 ASCII characters) is transmitted in the message, the
 high–order character will be transmitted first, followed by the low–order character.
 For example, if the LRC value is 61 hex (0110 0001):
 */
-unsigned char cModBusConnection::LongitudinalRedundancyCheck(
+unsigned char cModBusSim::LongitudinalRedundancyCheck(
 	unsigned char * msg, int len )
 {
 	unsigned char uchLRC = 0 ; /* LRC char initialized */
@@ -447,7 +496,7 @@ unsigned char cModBusConnection::LongitudinalRedundancyCheck(
 	}
 	return ((unsigned char)(-((char)uchLRC))) ; /* return twos complement */
 }
-unsigned short cModBusConnection::CyclicalRedundancyCheck(
+unsigned short cModBusSim::CyclicalRedundancyCheck(
 	unsigned char * msg, int len )
 {
 	/* Table of CRC values for high–order byte */
