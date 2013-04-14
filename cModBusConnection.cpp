@@ -360,6 +360,66 @@ int cConnectionSerial::Connect()
 }
 /**
 
+  Connect to TCP port communicating with MODBUS stations
+
+  @return 0 if no errors
+
+*/
+int cConnectionTCP::Connect()
+{
+	//-------------------------------
+	// Initialize socket library
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	wVersionRequested = MAKEWORD( 2, 2 );
+	WSAStartup( wVersionRequested, &wsaData );
+
+	//--------------------------------
+	// Declare and initialize variables.
+	char* ip = "127.0.0.1";
+	char* port = "27015";
+	struct addrinfo aiHints;
+	struct addrinfo *aiList = NULL;
+	int retVal;
+
+	//--------------------------------
+	// Setup the hints address info structure
+	// which is passed to the getaddrinfo() function
+	memset(&aiHints, 0, sizeof(aiHints));
+	aiHints.ai_family = AF_INET;
+	aiHints.ai_socktype = SOCK_STREAM;
+	aiHints.ai_protocol = IPPROTO_TCP;
+
+	//--------------------------------
+	// Call getaddrinfo(). If the call succeeds,
+	// the aiList variable will hold a linked list
+	// of addrinfo structures containing response
+	// information about the host
+	if ((retVal = getaddrinfo(ip, port, &aiHints, &aiList)) != 0) {
+		printf("getaddrinfo() failed.\n");
+		return 1;
+	}
+
+	//--------------------------------
+	// Connect to socket
+	ConnectSocket = INVALID_SOCKET;
+	struct addrinfo *ptr;
+	ptr = aiList;
+	ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, 
+		ptr->ai_protocol);
+	if (ConnectSocket == INVALID_SOCKET) {
+		printf("Error at socket(): %ld\n", WSAGetLastError());
+		return 1;
+	}
+	if( connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen) ) {
+		printf("Error at socket(): %ld\n", WSAGetLastError());
+		return 1;
+	}
+
+	return 0;
+}
+/**
+
   Start simulating the stations
 
   return 0 if no errors

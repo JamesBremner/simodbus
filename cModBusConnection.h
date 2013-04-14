@@ -46,6 +46,8 @@ public:
 
 class cConnectionTCP : public cConnectionBase
 {
+public:
+	int Connect();
 private:
 	SOCKET ConnectSocket;
 };
