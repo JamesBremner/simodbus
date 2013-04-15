@@ -112,6 +112,16 @@ cModBusSim::~cModBusSim(void)
 {
 }
 
+int cModBusSim::Connect()
+{
+	int iret =  myConnection->Connect();
+	if(  iret ) {
+		myErrorMsg = (char*)myConnection->GetLastError();
+	}
+	return iret;
+}
+
+
 void cModBusSim::setSerial()
 {
 	if( myConnection->IsSerial() )
@@ -352,8 +362,10 @@ int cConnectionSerial::Connect()
 		/*
 		Open connection
 		*/
-		if( ! mySerial.Open( szPort ) )
+		if( ! mySerial.Open( szPort ) ) {
+			myErrorMsg = (char * )mySerial.GetLastError();
 			return 1;
+		}
 
 		return 0;
 

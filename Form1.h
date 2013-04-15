@@ -581,7 +581,7 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 
 			 // Attempt connection
 			 if( theModBusSim.Connect() != OK ) {
-				 toolStripStatusLabel1->Text = "Connection Failed";
+				 toolStripStatusLabel1->Text = "Connection Failed" + gcnew String(theModBusSim.GetLastError());
 				 return;
 			 }
 			 // success

@@ -9,6 +9,7 @@ class cConnectionBase
 		tcp
 	} myType;
 	bool flagRTU;
+	char * myErrorMsg;
 
 
 public:
@@ -41,6 +42,7 @@ public:
 	void setRTU()							{ flagRTU = true; }
 	bool IsRTU()							{ return flagRTU; }
 
+	const char * GetLastError()				{ return myErrorMsg; }
 
 };
 /**
@@ -95,7 +97,7 @@ public:
 	cModBusSim(void);
 	~cModBusSim(void);
 
-	int Connect()				{ return myConnection->Connect(); }
+	int Connect();
 	void setSerial();
 	void setTCP();
 	bool IsSerial()				{ return myConnection->IsSerial(); }
@@ -118,6 +120,8 @@ public:
 	void setRTU()							{ myConnection->setRTU(); }
 	bool IsRTU()							{ return myConnection->IsRTU(); }
 
+	const char * GetLastError() { return myErrorMsg; }
+
 private:
 	std::string myHumanReadableMessage;
 	std::string myHumanReadableReply;
@@ -125,6 +129,8 @@ private:
 	unsigned char myBuffer[100];
 	
 	cConnectionBase * myConnection;
+
+	char * myErrorMsg;
 
 	void Server();
 	std::string MakeHumanReadable( unsigned char * msg, int len );
