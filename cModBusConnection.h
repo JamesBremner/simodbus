@@ -21,18 +21,18 @@ public:
 		, flagRTU( true )
 	{}
 
-	virtual int Connect()					{ return 1; }		///< No connection from base class
-	virtual bool IsOpened()					{ return false; }	///< base class cannot be opened
+	virtual int Connect()							{ return 1; }		///< No connection from base class
+	virtual bool IsOpened()							{ return false; }	///< base class cannot be opened
 	virtual int SendData
-		( const unsigned char *buffer, int size )
-											{ return 0; }		///< base class cannot send data
-	int WaitForData( int len, int msec )	{ return 0; }		///< base class always times out
-	int ReadData( void *, int )				{ return 0; }		///< base class connot read data
-	int ReadDataWaiting( void )				{ return 0; }		///< never any data on base class
+		( const unsigned char *buffer, int size )	{ return 0; }		///< base class cannot send data
+	virtual int WaitForData
+		( int len, int msec )						{ return 0; }		///< base class always times out
+	virtual int ReadData( void *, int )				{ return 0; }		///< base class connot read data
+	virtual int ReadDataWaiting( void )				{ return 0; }		///< never any data on base class
 
 	void setSerial()						{ myType = serial; }
 	void setTCP()							{ myType = tcp; }
-	void setCOMPort( int i )				{ }
+	virtual void setCOMPort( int i )		{ }
 
 	bool IsSerial()							{ return ( myType == serial ); }
 	bool IsTCP()							{ return ( myType == tcp ); }
