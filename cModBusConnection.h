@@ -43,14 +43,25 @@ public:
 
 
 };
+/**
 
+  Connect using a TCP socket
+
+*/
 class cConnectionTCP : public cConnectionBase
 {
 public:
 	int Connect();
+	virtual int SendData
+		( const unsigned char *buffer, int size );
 private:
 	SOCKET ConnectSocket;
 };
+/**
+
+  Connect using a serial port
+
+*/
 class cConnectionSerial : public cConnectionBase
 {
 public:
@@ -63,6 +74,9 @@ public:
 	int WaitForData( int len, int msec )	{ return mySerial.WaitForData( len, msec ); }
 	int ReadData( void * msg, int len )		{ return mySerial.ReadData( msg, len ); }
 	int ReadDataWaiting( void )				{ return mySerial.ReadDataWaiting(); }
+	int SendData
+		( const unsigned char *buffer, int size )
+	{ return mySerial.SendData( buffer, size ); }
 
 	void setCOMPort( int i )				{ myCOMPort = i; }
 private:

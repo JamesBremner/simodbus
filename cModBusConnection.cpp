@@ -420,6 +420,30 @@ int cConnectionTCP::Connect()
 }
 /**
 
+ Send data to the socket
+
+ @param[in] buffer
+ @param[in] size  number of bytes to send
+
+ @return 0 if there is an error
+
+*/
+int cConnectionTCP::SendData
+( const unsigned char *buffer, int size )
+{
+	int iResult = send(ConnectSocket,
+		(const char* )buffer, size, 0 );
+	if (iResult == SOCKET_ERROR) {
+		iResult = WSAGetLastError();
+		printf("send failed: %d\n", WSAGetLastError());
+		return 0;
+	}
+	return size;
+
+}
+
+/**
+
   Start simulating the stations
 
   return 0 if no errors
