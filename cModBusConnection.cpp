@@ -534,8 +534,8 @@ int cModBusSim::Poll()
 			}
 			len = 3 + 2 * block;
 			unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
-			myBuffer[5] = crc >> 8;
-			myBuffer[6] = 0xFF & crc;
+			myBuffer[len] = crc >> 8;
+			myBuffer[len+1] = 0xFF & crc;
 			len += 2;
 
 
