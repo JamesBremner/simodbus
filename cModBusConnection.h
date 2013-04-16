@@ -1,5 +1,9 @@
 #pragma once
+/**
 
+  Base class for all kinds of MODBUS connections
+
+  */
 class cConnectionBase
 {
 	protected:
@@ -67,20 +71,67 @@ private:
 class cConnectionSerial : public cConnectionBase
 {
 public:
+	/**
+
+	Construct serial connector
+
+	This does not open the connection - call Connect()
+
+	*/
 	cConnectionSerial()
 		: cConnectionBase( serial )
 		, myCOMPort( -1 )
 	{}
 	int Connect();
+
+	/// True if the connection is open
 	virtual bool IsOpened()					{ return mySerial.IsOpened(); }
+
+	/**
+	 Wait for some data to arrive.
+
+	 @param[in]  msec milliseconds to wait before timeout
+	 @param[in] len minimum amount of data reuired
+
+	  @return 1 if data ready, 0 if timeout
+
+	  */
 	int WaitForData( int len, int msec )	{ return mySerial.WaitForData( len, msec ); }
+/**
+
+  Read data from COM port
+
+  @param[in] msg pointer to location to store data
+  @param[in] len  maximum number of bytes to read
+
+  @return  0 if error
+
+*/	
 	int ReadData( void * msg, int len )		{ return mySerial.ReadData( msg, len ); }
+/**
+
+  Check for data waiting to be read
+
+  @return  the number of bytes waiting to be read
+
+*/
 	int ReadDataWaiting( void )				{ return mySerial.ReadDataWaiting(); }
+/**
+
+  Send data to the COM port
+
+  @param[in] buffer  pointer to data to be written
+  @param[in] size    number of bytes to write
+
+  @return 0 if error
+
+*/
 	int SendData
 		( const unsigned char *buffer, int size )
-	{ return mySerial.SendData( buffer, size ); }
+											{ return mySerial.SendData( buffer, size ); }
 
 	void setCOMPort( int i )				{ myCOMPort = i; }
+
 private:
 	raven::cSerial mySerial;
 	int myCOMPort;

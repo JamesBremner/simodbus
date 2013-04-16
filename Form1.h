@@ -1,5 +1,15 @@
 #pragma once
 
+/**
+
+ @mainpage  SIMODBUS
+
+ A modbus master/slave simulator
+
+*/
+
+
+
 #include "DlgConfiger.h"
 
 #define OK 0
@@ -13,15 +23,8 @@ namespace simodbus {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-	/// <summary>
-	/// Summary for Form1
+	/// Main window
 	///
-	/// WARNING: If you change the name of this class, you will need to change the
-	///          'Resource File Name' property for the managed resource compiler tool
-	///          associated with all .resx files this class depends on.  Otherwise,
-	///          the designers will not be able to interact properly with localized
-	///          resources associated with this form.
-	/// </summary>
 	public ref class Form1 : public System::Windows::Forms::Form
 	{
 	public:
