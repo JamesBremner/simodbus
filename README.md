@@ -11,7 +11,7 @@ Features
 
 3. Option to simulate a master or a slave.
 
-4. Option to use serial port or TCP   ( TCP NYI )
+4. Option to use serial port or TCP
 
 5. Option to use ASCII or RTU mode
 

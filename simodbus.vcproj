@@ -358,6 +358,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\cConnectionTCP.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\cModBusConnection.cpp"
 				>
 				<FileConfiguration

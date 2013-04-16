@@ -582,15 +582,19 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 				 theModBusSim.setASCII();
 			 }
 
-			 // Attempt connection
-			 if( theModBusSim.Connect() != OK ) {
-				 toolStripStatusLabel1->Text = "Connection Failed" + gcnew String(theModBusSim.GetLastError());
-				 return;
-			 }
-			 // success
 			 if( rbSTATIONS->Checked ) {
+				 if( theModBusSim.Slave() != OK ) {
+					 toolStripStatusLabel1->Text = "Connection Failed";
+					 return;
+				 }
 				 this->Text = "Simodbus ( Stations )";
+
 			 } else if ( rbMASTER->Checked ) {
+				 // Attempt connection
+				 if( theModBusSim.Connect() != OK ) {
+					 toolStripStatusLabel1->Text = "Connection Failed" + gcnew String(theModBusSim.GetLastError());
+					 return;
+				 }
 				 this->Text = "Simodbus ( Master )";
 			 }
 			 RUN->Enabled			= false;
@@ -598,12 +602,10 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 			 rbMASTER->Enabled		= false;
 
 			 if( rbSTATIONS->Checked ) {
-				 if( theModBusSim.IsSerial() ) {
-					 // start timer for serial slave server
+					 // start timer for slave server
 					 timer1->Interval = 1000;
 					 timer1->Enabled = true;
 					 toolStripStatusLabel1->Text = "Serial station simulator running";
-				 }
 			 }
 
 		 }

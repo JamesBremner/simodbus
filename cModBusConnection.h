@@ -1,7 +1,13 @@
 #pragma once
+
+
 /**
 
   Base class for all kinds of MODBUS connections
+
+  This maintains the type of connection and provides a common inerface
+  for all types.  If you try to open a connection, read or write using this
+  then you will simply get an error return.
 
   */
 class cConnectionBase
@@ -27,6 +33,7 @@ public:
 	{}
 
 	virtual int Connect()							{ return 1; }		///< No connection from base class
+	virtual int Slave()								{ return 1; }		///< No slave simulator in base class
 	virtual bool IsOpened()							{ return false; }	///< base class cannot be opened
 	virtual int SendData
 		( const unsigned char *buffer, int size )	{ return 0; }		///< base class cannot send data
@@ -49,6 +56,8 @@ public:
 	const char * GetLastError()				{ return myErrorMsg; }
 
 };
+
+
 /**
 
   Connect using a TCP socket
@@ -57,11 +66,27 @@ public:
 class cConnectionTCP : public cConnectionBase
 {
 public:
+	cConnectionTCP()
+		: cConnectionBase( tcp )
+		, myPort( 27016 )
+		, myFlagOpen( false )
+	{}
 	int Connect();
-	virtual int SendData
+	bool IsOpened()							{ return myFlagOpen; }
+	int Slave();
+	int SendData
 		( const unsigned char *buffer, int size );
+	int ReadDataWaiting( void );
+	int ReadData( void *msg, int len );
+	virtual int WaitForData
+		( int len, int msec );
 private:
 	SOCKET ConnectSocket;
+	int myPort;
+	bool myFlagOpen;
+	bool myFlagSlave;
+
+
 };
 /**
 
@@ -82,7 +107,19 @@ public:
 		: cConnectionBase( serial )
 		, myCOMPort( -1 )
 	{}
+
 	int Connect();
+
+	/**
+
+	Start simulating the stations
+
+	This simply opens the connection.
+	All stations are assumed to be on one port
+	The application is responsible for polling the port
+
+	*/
+	int Slave()								{ return Connect(); }
 
 	/// True if the connection is open
 	virtual bool IsOpened()					{ return mySerial.IsOpened(); }
