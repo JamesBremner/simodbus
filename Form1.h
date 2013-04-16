@@ -352,7 +352,6 @@ namespace simodbus {
 			this->rbTCP->Name = L"rbTCP";
 			this->rbTCP->Size = System::Drawing::Size(46, 17);
 			this->rbTCP->TabIndex = 11;
-			this->rbTCP->TabStop = true;
 			this->rbTCP->Text = L"TCP";
 			this->rbTCP->UseVisualStyleBackColor = true;
 			// 
@@ -374,6 +373,7 @@ namespace simodbus {
 			// rbSERIAL
 			// 
 			this->rbSERIAL->AutoSize = true;
+			this->rbSERIAL->Checked = true;
 			this->rbSERIAL->Location = System::Drawing::Point(26, 25);
 			this->rbSERIAL->Name = L"rbSERIAL";
 			this->rbSERIAL->Size = System::Drawing::Size(51, 17);

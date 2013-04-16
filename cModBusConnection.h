@@ -177,7 +177,7 @@ private:
 	std::string myHumanReadableMessage;
 	std::string myHumanReadableReply;
 	float myValue;
-	unsigned char myBuffer[100];
+	unsigned char myBuffer[1000];
 	
 	cConnectionBase * myConnection;
 

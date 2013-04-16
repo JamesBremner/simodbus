@@ -247,36 +247,38 @@ std::string cModBusSim::getReply()
 
   @return 0 if no errors
 
-*/
+  */
 int cConnectionSerial::Connect()
 {
-		if( myCOMPort < 1 )
-			return 1;
-		char szPort[100];
-		sprintf_s(szPort,99,"COM%d",myCOMPort);
+	if( myCOMPort < 1 ) {
+		myErrorMsg = "Bad port number";
+		return 1;
+	}
+	char szPort[100];
+	sprintf_s(szPort,99,"COM%d",myCOMPort);
 
-		/*
-		Configure connection according to MODBUS mode
-		*/
-		if( ! flagRTU ) {
-			mySerial.SetParity(0);
-			mySerial.SetByteSize(7);
-			mySerial.SetStopBits(TWOSTOPBITS);
-		} else {
-			mySerial.SetParity(0);
-			mySerial.SetByteSize(8);
-			mySerial.SetStopBits(ONESTOPBIT);
-		}
+	/*
+	Configure connection according to MODBUS mode
+	*/
+	if( ! flagRTU ) {
+		mySerial.SetParity(0);
+		mySerial.SetByteSize(7);
+		mySerial.SetStopBits(TWOSTOPBITS);
+	} else {
+		mySerial.SetParity(0);
+		mySerial.SetByteSize(8);
+		mySerial.SetStopBits(ONESTOPBIT);
+	}
 
-		/*
-		Open connection
-		*/
-		if( ! mySerial.Open( szPort ) ) {
-			myErrorMsg = (char * )mySerial.GetLastError();
-			return 1;
-		}
+	/*
+	Open connection
+	*/
+	if( ! mySerial.Open( szPort ) ) {
+		myErrorMsg = (char * )mySerial.GetLastError();
+		return 1;
+	}
 
-		return 0;
+	return 0;
 
 }
 /**
