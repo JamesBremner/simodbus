@@ -540,7 +540,7 @@ namespace simodbus {
 
   Time for slave simulator to check for input from master
 
-*/
+  */
 private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
 
 			 int ret = theModBusSim.Poll();
@@ -602,10 +602,10 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 			 rbMASTER->Enabled		= false;
 
 			 if( rbSTATIONS->Checked ) {
-					 // start timer for slave server
-					 timer1->Interval = 1000;
-					 timer1->Enabled = true;
-					 toolStripStatusLabel1->Text = "Serial station simulator running";
+				 // start timer for slave server
+				 timer1->Interval = 100;
+				 timer1->Enabled = true;
+				 toolStripStatusLabel1->Text = "Station simulator running";
 			 }
 
 		 }

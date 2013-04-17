@@ -6,102 +6,6 @@
 cModBusSim theModBusSim;
 
 
-/*
-class cModbusSlaveConnect
-	: public boost::enable_shared_from_this<cModbusSlaveConnect>
-{
-public:
-	typedef boost::shared_ptr<cModbusSlaveConnect> pointer;
-
-	~cModbusSlaveConnect()
-	{
-		printf(" connection destroyed\n");
-	}
-
-	static pointer create(boost::asio::io_service& io_service)
-	{
-		return pointer(new cModbusSlaveConnect(io_service));
-	}
-	boost::asio::ip::tcp::socket& socket()
-	{
-		return socket_;
-	}
-	void start()
-	{
-		printf("Connected\n");
-
-		connected = true;
-
-		wait();
-
-	}
-
-	void wait()
-{
-	socket_.async_read_some(boost::asio::buffer(myBuffer,256),
-		boost::bind(&cModbusSlaveConnect::reader,this,
-		boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
-
-	}
-	void reader( const boost::system::error_code& error,
-		std::size_t len )
-	{
-		if (error) {
-			return;
-		}
-	}
-
-
-private:
-	cModbusSlaveConnect(boost::asio::io_service& io_service)
-		: socket_(io_service)
-		, connected( false )
-	{  }
-	boost::asio::ip::tcp::socket socket_;
-
-  char myBuffer[256];
-
-  bool connected;
-};
-
-class cModbusSlaveServer
-{
-public:
-	cModbusSlaveServer(boost::asio::io_service& io_service)
-		: acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
-				27015))
-	{
-		start_accept();
-	}
-
-private:
-	void start_accept()
-	{
-		cModbusSlaveConnect::pointer new_connection = cModbusSlaveConnect::create(acceptor_.get_io_service());
-
-		acceptor_.async_accept(new_connection->socket(),
-			boost::bind(&cModbusSlaveServer::handle_accept, this, new_connection,
-			boost::asio::placeholders::error));
-	}
-
-	void handle_accept(cModbusSlaveConnect::pointer new_connection,
-		const boost::system::error_code& error)
-	{
-		if (!error)
-		{
-			// start the new connection running
-			new_connection->start();
-
-			// get ready to accept next connection
-			start_accept();
-		}
-	}
-
-	boost::asio::ip::tcp::acceptor acceptor_;
-};
-
-*/
-
 cModBusSim::cModBusSim(void)
 : myConnection( new cConnectionBase )
 {
@@ -183,13 +87,6 @@ void cModBusSim::SendQueryRead( int Station, int Register )
 			(const unsigned char *)buf,
 			msglen );
 
-	//if( flagTCP ) {
-	//	int iResult = send(ConnectSocket,(const char *)buf,msglen, 0 );
-	//	if (iResult == SOCKET_ERROR) {
-	//		iResult = WSAGetLastError();
-	//		printf("send failed: %d\n", WSAGetLastError());
-	//	}
-	//} else {
 		Sleep(300);
 		if( ! myConnection->WaitForData(
 			7,
