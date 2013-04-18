@@ -15,7 +15,11 @@ cModBusSim::cModBusSim(void)
 cModBusSim::~cModBusSim(void)
 {
 }
+/**
 
+  Open the connection
+
+*/
 int cModBusSim::Connect()
 {
 	int iret =  myConnection->Connect();
@@ -25,7 +29,11 @@ int cModBusSim::Connect()
 	return iret;
 }
 
+/**
 
+  Use serial port to communicate
+
+*/
 void cModBusSim::setSerial()
 {
 	if( myConnection->IsSerial() )
@@ -33,6 +41,11 @@ void cModBusSim::setSerial()
 	delete myConnection;
 	myConnection = new cConnectionSerial();
 }
+/**
+
+  Use TCP socket to communicate
+
+*/
 void cModBusSim::setTCP()
 {
 	if( myConnection->IsTCP() )
@@ -116,7 +129,16 @@ void cModBusSim::SendQueryRead( int Station, int Register )
 	
 
 }
+/**
 
+  Make binary message human readable
+
+  @param[in] msg  the binary message
+  @param[in] len  the length of the message
+
+  @return The message in hex format  e.g.  23 FF 4A ...
+
+*/
 std::string cModBusSim::MakeHumanReadable( unsigned char * msg, int len )
 {
 	std::string readable;
@@ -128,6 +150,13 @@ std::string cModBusSim::MakeHumanReadable( unsigned char * msg, int len )
 	readable += "\r\n";
 	return readable;
 }
+/**
+
+  Get the reply from slave
+
+  @return The message in hex format  e.g.  23 FF 4A ...
+
+*/
 std::string cModBusSim::getReply()
 {
 	if( myHumanReadableReply.length() ) {
