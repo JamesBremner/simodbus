@@ -282,11 +282,11 @@ int cModBusSim::Poll()
 		if( cmd == 3 || cmd == 4 ) {
 
 			// for any read command
-			// return just one value = 1
+			// return 1 for first register, 2 for second ...
 			myBuffer[2] = 2 * block;
 			for( int kr = 0; kr < block; kr++ ) {
 				myBuffer[3+kr*2] = 0;
-				myBuffer[4+kr*2] = 1;
+				myBuffer[4+kr*2] = kr+1;
 			}
 			len = 3 + 2 * block;
 			unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
