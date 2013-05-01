@@ -63,9 +63,11 @@ namespace simodbus {
 	private: System::Windows::Forms::TextBox^  Register;
 
 	private: System::Windows::Forms::Label^  label4;
-	private: System::Windows::Forms::Button^  Read;
+	private: System::Windows::Forms::Button^  MQRead;
 
-	private: System::Windows::Forms::Button^  button2;
+	private: System::Windows::Forms::Button^  MQWrite;
+
+
 	private: System::Windows::Forms::TextBox^  Value;
 	private: System::Windows::Forms::Timer^  timer1;
 	private: System::Windows::Forms::StatusStrip^  statusStrip;
@@ -125,8 +127,8 @@ namespace simodbus {
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->Register = (gcnew System::Windows::Forms::TextBox());
 			this->label4 = (gcnew System::Windows::Forms::Label());
-			this->Read = (gcnew System::Windows::Forms::Button());
-			this->button2 = (gcnew System::Windows::Forms::Button());
+			this->MQRead = (gcnew System::Windows::Forms::Button());
+			this->MQWrite = (gcnew System::Windows::Forms::Button());
 			this->Value = (gcnew System::Windows::Forms::TextBox());
 			this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
 			this->statusStrip = (gcnew System::Windows::Forms::StatusStrip());
@@ -209,24 +211,25 @@ namespace simodbus {
 			this->label4->TabIndex = 7;
 			this->label4->Text = L"Value: ";
 			// 
-			// Read
+			// MQRead
 			// 
-			this->Read->Location = System::Drawing::Point(146, 31);
-			this->Read->Name = L"Read";
-			this->Read->Size = System::Drawing::Size(75, 23);
-			this->Read->TabIndex = 8;
-			this->Read->Text = L"READ";
-			this->Read->UseVisualStyleBackColor = true;
-			this->Read->Click += gcnew System::EventHandler(this, &Form1::Read_Click);
+			this->MQRead->Location = System::Drawing::Point(146, 31);
+			this->MQRead->Name = L"MQRead";
+			this->MQRead->Size = System::Drawing::Size(75, 23);
+			this->MQRead->TabIndex = 8;
+			this->MQRead->Text = L"READ";
+			this->MQRead->UseVisualStyleBackColor = true;
+			this->MQRead->Click += gcnew System::EventHandler(this, &Form1::Read_Click);
 			// 
-			// button2
+			// MQWrite
 			// 
-			this->button2->Location = System::Drawing::Point(146, 68);
-			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(75, 23);
-			this->button2->TabIndex = 9;
-			this->button2->Text = L"WRITE";
-			this->button2->UseVisualStyleBackColor = true;
+			this->MQWrite->Location = System::Drawing::Point(146, 68);
+			this->MQWrite->Name = L"MQWrite";
+			this->MQWrite->Size = System::Drawing::Size(75, 23);
+			this->MQWrite->TabIndex = 9;
+			this->MQWrite->Text = L"WRITE";
+			this->MQWrite->UseVisualStyleBackColor = true;
+			this->MQWrite->Click += gcnew System::EventHandler(this, &Form1::MQWrite_Click);
 			// 
 			// Value
 			// 
@@ -247,6 +250,7 @@ namespace simodbus {
 			this->statusStrip->Size = System::Drawing::Size(672, 22);
 			this->statusStrip->TabIndex = 11;
 			this->statusStrip->Text = L"statusStrip1";
+			this->statusStrip->ItemClicked += gcnew System::Windows::Forms::ToolStripItemClickedEventHandler(this, &Form1::statusStrip_ItemClicked);
 			// 
 			// toolStripStatusLabel1
 			// 
@@ -260,8 +264,8 @@ namespace simodbus {
 			this->groupBox1->Controls->Add(this->Value);
 			this->groupBox1->Controls->Add(this->label2);
 			this->groupBox1->Controls->Add(this->label4);
-			this->groupBox1->Controls->Add(this->button2);
-			this->groupBox1->Controls->Add(this->Read);
+			this->groupBox1->Controls->Add(this->MQWrite);
+			this->groupBox1->Controls->Add(this->MQRead);
 			this->groupBox1->Location = System::Drawing::Point(12, 117);
 			this->groupBox1->Name = L"groupBox1";
 			this->groupBox1->Size = System::Drawing::Size(344, 100);
@@ -583,30 +587,36 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 			 }
 
 			 if( rbSTATIONS->Checked ) {
+				 // attempt connection as slave
 				 if( theModBusSim.Slave() != OK ) {
 					 toolStripStatusLabel1->Text = "Connection Failed";
 					 return;
 				 }
 				 this->Text = "Simodbus ( Stations )";
+				 // start timer for slave server
+				 timer1->Interval = 100;
+				 timer1->Enabled = true;
+
+				 toolStripStatusLabel1->Text = "Station simulator running";
+				 MQRead->Enabled = false;
+				 MQWrite->Enabled = false;
 
 			 } else if ( rbMASTER->Checked ) {
-				 // Attempt connection
+				 // Attempt connection as master
 				 if( theModBusSim.Connect() != OK ) {
 					 toolStripStatusLabel1->Text = "Connection Failed" + gcnew String(theModBusSim.GetLastError());
 					 return;
 				 }
 				 this->Text = "Simodbus ( Master )";
+
+			 } else {
+				 return;
 			 }
+
 			 RUN->Enabled			= false;
 			 rbSTATIONS->Enabled	= false;
 			 rbMASTER->Enabled		= false;
 
-			 if( rbSTATIONS->Checked ) {
-				 // start timer for slave server
-				 timer1->Interval = 100;
-				 timer1->Enabled = true;
-				 toolStripStatusLabel1->Text = "Station simulator running";
-			 }
 
 		 }
 public:
@@ -624,6 +634,10 @@ public:
 		logWindow->SelectionLength = logWindow->Text->Length - start - 1;
 		logWindow->SelectionColor  = Color::Red;
 	}
+private: System::Void statusStrip_ItemClicked(System::Object^  sender, System::Windows::Forms::ToolStripItemClickedEventArgs^  e) {
+		 }
+private: System::Void MQWrite_Click(System::Object^  sender, System::EventArgs^  e) {
+		 }
 };
 }
 
