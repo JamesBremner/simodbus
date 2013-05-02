@@ -103,6 +103,10 @@ namespace simodbus {
 	private: System::Windows::Forms::RadioButton^  rbRTU;
 	private: System::Windows::Forms::RadioButton^  rbASCII;
 	private: System::Windows::Forms::RichTextBox^  logWindow;
+	private: System::Windows::Forms::TextBox^  TextBlockLength;
+
+
+	private: System::Windows::Forms::Label^  label7;
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -134,6 +138,8 @@ namespace simodbus {
 			this->statusStrip = (gcnew System::Windows::Forms::StatusStrip());
 			this->toolStripStatusLabel1 = (gcnew System::Windows::Forms::ToolStripStatusLabel());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->TextBlockLength = (gcnew System::Windows::Forms::TextBox());
+			this->label7 = (gcnew System::Windows::Forms::Label());
 			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
 			this->RUN = (gcnew System::Windows::Forms::Button());
 			this->rbSTATIONS = (gcnew System::Windows::Forms::RadioButton());
@@ -173,7 +179,7 @@ namespace simodbus {
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(21, 33);
+			this->label2->Location = System::Drawing::Point(6, 33);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(40, 13);
 			this->label2->TabIndex = 3;
@@ -181,7 +187,7 @@ namespace simodbus {
 			// 
 			// Station
 			// 
-			this->Station->Location = System::Drawing::Point(85, 150);
+			this->Station->Location = System::Drawing::Point(56, 33);
 			this->Station->Name = L"Station";
 			this->Station->Size = System::Drawing::Size(58, 20);
 			this->Station->TabIndex = 4;
@@ -189,7 +195,7 @@ namespace simodbus {
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(21, 70);
+			this->label3->Location = System::Drawing::Point(127, 33);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(46, 13);
 			this->label3->TabIndex = 5;
@@ -197,7 +203,7 @@ namespace simodbus {
 			// 
 			// Register
 			// 
-			this->Register->Location = System::Drawing::Point(85, 187);
+			this->Register->Location = System::Drawing::Point(177, 33);
 			this->Register->Name = L"Register";
 			this->Register->Size = System::Drawing::Size(58, 20);
 			this->Register->TabIndex = 6;
@@ -205,7 +211,7 @@ namespace simodbus {
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(248, 33);
+			this->label4->Location = System::Drawing::Point(217, 76);
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(40, 13);
 			this->label4->TabIndex = 7;
@@ -213,7 +219,7 @@ namespace simodbus {
 			// 
 			// MQRead
 			// 
-			this->MQRead->Location = System::Drawing::Point(146, 31);
+			this->MQRead->Location = System::Drawing::Point(24, 71);
 			this->MQRead->Name = L"MQRead";
 			this->MQRead->Size = System::Drawing::Size(75, 23);
 			this->MQRead->TabIndex = 8;
@@ -223,7 +229,7 @@ namespace simodbus {
 			// 
 			// MQWrite
 			// 
-			this->MQWrite->Location = System::Drawing::Point(146, 68);
+			this->MQWrite->Location = System::Drawing::Point(136, 70);
 			this->MQWrite->Name = L"MQWrite";
 			this->MQWrite->Size = System::Drawing::Size(75, 23);
 			this->MQWrite->TabIndex = 9;
@@ -233,10 +239,11 @@ namespace simodbus {
 			// 
 			// Value
 			// 
-			this->Value->Location = System::Drawing::Point(251, 49);
+			this->Value->Location = System::Drawing::Point(256, 73);
 			this->Value->Name = L"Value";
 			this->Value->Size = System::Drawing::Size(69, 20);
 			this->Value->TabIndex = 10;
+			this->Value->TextChanged += gcnew System::EventHandler(this, &Form1::Value_TextChanged);
 			// 
 			// timer1
 			// 
@@ -260,18 +267,38 @@ namespace simodbus {
 			// 
 			// groupBox1
 			// 
+			this->groupBox1->Controls->Add(this->TextBlockLength);
+			this->groupBox1->Controls->Add(this->label7);
 			this->groupBox1->Controls->Add(this->label3);
 			this->groupBox1->Controls->Add(this->Value);
 			this->groupBox1->Controls->Add(this->label2);
 			this->groupBox1->Controls->Add(this->label4);
-			this->groupBox1->Controls->Add(this->MQWrite);
+			this->groupBox1->Controls->Add(this->Register);
+			this->groupBox1->Controls->Add(this->Station);
 			this->groupBox1->Controls->Add(this->MQRead);
+			this->groupBox1->Controls->Add(this->MQWrite);
 			this->groupBox1->Location = System::Drawing::Point(12, 117);
 			this->groupBox1->Name = L"groupBox1";
 			this->groupBox1->Size = System::Drawing::Size(344, 100);
 			this->groupBox1->TabIndex = 12;
 			this->groupBox1->TabStop = false;
 			this->groupBox1->Text = L"Master Query";
+			// 
+			// TextBlockLength
+			// 
+			this->TextBlockLength->Location = System::Drawing::Point(273, 33);
+			this->TextBlockLength->Name = L"TextBlockLength";
+			this->TextBlockLength->Size = System::Drawing::Size(56, 20);
+			this->TextBlockLength->TabIndex = 12;
+			// 
+			// label7
+			// 
+			this->label7->AutoSize = true;
+			this->label7->Location = System::Drawing::Point(253, 34);
+			this->label7->Name = L"label7";
+			this->label7->Size = System::Drawing::Size(14, 13);
+			this->label7->TabIndex = 11;
+			this->label7->Text = L"#";
 			// 
 			// groupBox2
 			// 
@@ -391,7 +418,7 @@ namespace simodbus {
 			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 			this->dataGridView1->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(3) {this->dataGridViewTextBoxColumn1, 
 				this->dataGridViewTextBoxColumn2, this->dataGridViewTextBoxColumn3});
-			this->dataGridView1->Location = System::Drawing::Point(12, 221);
+			this->dataGridView1->Location = System::Drawing::Point(12, 223);
 			this->dataGridView1->Name = L"dataGridView1";
 			this->dataGridView1->Size = System::Drawing::Size(344, 247);
 			this->dataGridView1->TabIndex = 17;
@@ -462,8 +489,6 @@ namespace simodbus {
 			this->Controls->Add(this->dataGridView1);
 			this->Controls->Add(this->groupBox2);
 			this->Controls->Add(this->statusStrip);
-			this->Controls->Add(this->Register);
-			this->Controls->Add(this->Station);
 			this->Controls->Add(this->groupBox3);
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->groupBox1);
@@ -526,21 +551,27 @@ namespace simodbus {
 			 */
 	private: System::Void Read_Click(System::Object^  sender, System::EventArgs^  e) {
 
+				 int reg =   Convert::ToInt32(Register->Text);
+				 int BlockLength = Convert::ToInt32(TextBlockLength->Text);
+				 if( 1 > BlockLength || BlockLength > BlockLength )
+					 return;
 				 theModBusSim.SendQueryRead(
 					 Convert::ToInt32(Station->Text),
-					 Convert::ToInt32(Register->Text) );
+					 reg,
+					 BlockLength );
 				 DisplayMessageAndReply();
-				 Value->Text = theModBusSim.getValue().ToString();
-
 
 				 array<String^>^ row = gcnew array<String^>(3);
-				 row[0] = Station->Text;
-				 row[1] = Register->Text;
-				 row[2] = Value->Text;
-				 dataGridView1->Rows->Add( row );
+				 for( int k = 0; k < BlockLength; k++ ) {
+					 row[0] = Station->Text;
+					 int kreg =  reg + k;
+					 row[1] = kreg.ToString();
+					 row[2] = theModBusSim.getValue(k+1).ToString();
+					 dataGridView1->Rows->Add( row );
+				 }
 
 			 }
-/**
+			 /**
 
   Time for slave simulator to check for input from master
 
@@ -637,6 +668,8 @@ public:
 private: System::Void statusStrip_ItemClicked(System::Object^  sender, System::Windows::Forms::ToolStripItemClickedEventArgs^  e) {
 		 }
 private: System::Void MQWrite_Click(System::Object^  sender, System::EventArgs^  e) {
+		 }
+private: System::Void Value_TextChanged(System::Object^  sender, System::EventArgs^  e) {
 		 }
 };
 }

@@ -60,10 +60,17 @@ void cModBusSim::setTCP()
 
   @param[in] Station
   @param[in] Register
+  @param[in] BlockLength number of registers to read
 
 */
-void cModBusSim::SendQueryRead( int Station, int Register )
+void cModBusSim::SendQueryRead( 
+				int Station,
+				int Register,
+				int BlockLength )
 {
+	// check for valid block length
+	if( 1 > BlockLength || BlockLength > 255 )
+		return;
 	unsigned char buf[1000];
 	int msglen;
 	if( IsRTU() ) {
@@ -72,7 +79,7 @@ void cModBusSim::SendQueryRead( int Station, int Register )
 		buf[2] = 0;				// max register 255
 		buf[3] = Register;
 		buf[4] = 0;
-		buf[5] = 1;
+		buf[5] = BlockLength;
 		unsigned short crc = CyclicalRedundancyCheck( buf,6);
 		buf[6] = crc >> 8;
 		buf[7] = 0xFF & crc;
@@ -86,7 +93,7 @@ void cModBusSim::SendQueryRead( int Station, int Register )
 		buf[5] = Register >> 4;
 		buf[6] = 0xF  & Register;
 		buf[7] = 0;
-		buf[8] = 1;					// read one register
+		buf[8] = BlockLength;					
 		unsigned char lrc = LongitudinalRedundancyCheck( &buf[1],8);
 		buf[9] =  lrc  >> 4;					// LRC
 		buf[10] = 0xF & lrc;
@@ -113,22 +120,38 @@ void cModBusSim::SendQueryRead( int Station, int Register )
 			999);
 		myHumanReadableReply = MakeHumanReadable(buf,msglen);
 
+		// Decode values returned
 		int iv;
 		union  {
 			short s;
 			unsigned char c[2];
 		} v;
-		v.c[0] = buf[4];
-		v.c[1] = buf[3];
+		for( int k = 0; k < BlockLength; k++ ) {
+			v.c[0] = buf[k*2 + 4];
+			v.c[1] = buf[k*2 + 3];
 
-		iv = v.s & 0x7FFF;
-		if( v.s & 0x8000 )
-			iv -= 32767;
-		myValue = iv / 1000.0f;
+			iv = v.s & 0x7FFF;
+			if( v.s & 0x8000 )
+				iv -= 32767;
+			myValueArray[k] = iv / 1000.0f;
 
-	
+		}
 
 }
+/**
+
+  get value returned from read query
+
+  @param[in] i 1-based index
+
+*/
+float cModBusSim::getValue( int i )
+{
+	if( 1 > i || i > 255 )
+		return -1;
+	return myValueArray[i-1];
+}
+
 /**
 
   Make binary message human readable

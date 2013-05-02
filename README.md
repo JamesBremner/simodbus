@@ -23,8 +23,8 @@ Features
 
 9. Able to configure station numbers and register numbers that the slave will simulate.  ( NYI )
 
-10. Able to send a read query to a specified station and register. 
-    Value returned will be decoded and displayed.
+10. Able to send a read query to a specified station and register block. 
+    Values returned will be decoded and displayed.
     
 11. Able to send a write query to a specified station and register with a specified value.  ( NYI )
 

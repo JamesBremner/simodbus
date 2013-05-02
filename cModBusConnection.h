@@ -191,10 +191,10 @@ public:
 	bool IsSerial()				{ return myConnection->IsSerial(); }
 	bool IsTCP()				{ return myConnection->IsTCP(); }
 
-	void SendQueryRead( int Station, int Register );
+	void SendQueryRead( int Station, int Register, int Length );
 	std::string getMessageSent()			{ return myHumanReadableMessage; }
 	std::string getReply();
-	float getValue()						{ return myValue; }
+	float getValue( int i = 1 );
 	
 	int Slave();
 	
@@ -214,6 +214,7 @@ private:
 	std::string myHumanReadableMessage;
 	std::string myHumanReadableReply;
 	float myValue;
+	float myValueArray[255];
 	unsigned char myBuffer[1000];
 	
 	cConnectionBase * myConnection;
