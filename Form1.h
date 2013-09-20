@@ -290,6 +290,7 @@ namespace simodbus {
 			this->TextBlockLength->Name = L"TextBlockLength";
 			this->TextBlockLength->Size = System::Drawing::Size(56, 20);
 			this->TextBlockLength->TabIndex = 12;
+			this->TextBlockLength->TextChanged += gcnew System::EventHandler(this, &Form1::TextBlockLength_TextChanged);
 			// 
 			// label7
 			// 
@@ -552,9 +553,14 @@ namespace simodbus {
 	private: System::Void Read_Click(System::Object^  sender, System::EventArgs^  e) {
 
 				 int reg =   Convert::ToInt32(Register->Text);
-				 int BlockLength = Convert::ToInt32(TextBlockLength->Text);
+
+				 // How many registers to read, default 1
+				 int BlockLength;
+				 if( ! Int32::TryParse( TextBlockLength->Text, BlockLength ) )
+					 BlockLength = 1;
 				 if( 1 > BlockLength || BlockLength > BlockLength )
 					 return;
+
 				 theModBusSim.SendQueryRead(
 					 Convert::ToInt32(Station->Text),
 					 reg,
@@ -639,6 +645,7 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 					 return;
 				 }
 				 this->Text = "Simodbus ( Master )";
+				 toolStripStatusLabel1->Text = "Master simulator running";
 
 			 } else {
 				 return;
@@ -668,8 +675,11 @@ public:
 private: System::Void statusStrip_ItemClicked(System::Object^  sender, System::Windows::Forms::ToolStripItemClickedEventArgs^  e) {
 		 }
 private: System::Void MQWrite_Click(System::Object^  sender, System::EventArgs^  e) {
+			 toolStripStatusLabel1->Text = "Write to Slave NYI";
 		 }
 private: System::Void Value_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+		 }
+private: System::Void TextBlockLength_TextChanged(System::Object^  sender, System::EventArgs^  e) {
 		 }
 };
 }

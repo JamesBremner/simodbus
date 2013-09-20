@@ -64,6 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(NoInherit);Ws2_32.lib"
+				OutputFile="$(SolutionDir)\bin\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="J:\boost\boost_1_53\stage\lib"
 				GenerateDebugInformation="true"
@@ -215,6 +216,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib $(NOINHERIT)"
+				OutputFile="$(SolutionDir)\bin\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -406,8 +408,16 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\code\ravenset\Serial.cpp"
+				RelativePath="$(RAVENROOT)\Serial.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
 					>
