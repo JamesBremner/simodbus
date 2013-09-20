@@ -192,6 +192,7 @@ public:
 	bool IsTCP()				{ return myConnection->IsTCP(); }
 
 	void SendQueryRead( int Station, int Register, int Length );
+	void SendQueryWrite( int Station, int Register, int Value );
 	std::string getMessageSent()			{ return myHumanReadableMessage; }
 	std::string getReply();
 	float getValue( int i = 1 );

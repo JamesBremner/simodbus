@@ -138,6 +138,61 @@ void cModBusSim::SendQueryRead(
 		}
 
 }
+void cModBusSim::SendQueryWrite( int Station, int Register, int Value )
+{
+	if( 1 > Value || Value > 255 )
+		return;
+	unsigned char buf[1000];
+	int msglen;
+	if( IsRTU() ) {
+		buf[0] = Station;
+		buf[1] = 6;
+		buf[2] = 0;				// max register 255
+		buf[3] = Register;
+		buf[4] = 0;
+		buf[5] = Value;
+		unsigned short crc = CyclicalRedundancyCheck( buf,6);
+		buf[6] = crc >> 8;
+		buf[7] = 0xFF & crc;
+		msglen = 8;
+	} else {
+		buf[0] = ':';				// ASCII framing start
+		buf[1] = Station >> 4;
+		buf[2] = 0xF  & Station;
+		buf[3] = 0;
+		buf[4] = 6;					// write command
+		buf[5] = Register >> 4;
+		buf[6] = 0xF  & Register;
+		buf[7] = 0;
+		buf[8] = Value;					
+		unsigned char lrc = LongitudinalRedundancyCheck( &buf[1],8);
+		buf[9] =  lrc  >> 4;					// LRC
+		buf[10] = 0xF & lrc;
+		buf[11] = '\r';				// ASCFII framing end
+		buf[12] = '\n';	
+		msglen = 13;
+	}
+	myHumanReadableMessage = MakeHumanReadable( buf,msglen);
+
+	myConnection->SendData( 
+			(const unsigned char *)buf,
+			msglen );
+
+		Sleep(300);
+		if( ! myConnection->WaitForData(
+			7,
+			6000 ) ) {
+				myHumanReadableReply = "timed out\r\n";
+			return;
+		}
+		memset(buf,'\0',100);
+		msglen = myConnection->ReadData(
+			buf,
+			999);
+		myHumanReadableReply = MakeHumanReadable(buf,msglen);
+
+}
+
 /**
 
   get value returned from read query

@@ -675,12 +675,26 @@ public:
 private: System::Void statusStrip_ItemClicked(System::Object^  sender, System::Windows::Forms::ToolStripItemClickedEventArgs^  e) {
 		 }
 private: System::Void MQWrite_Click(System::Object^  sender, System::EventArgs^  e) {
-			 toolStripStatusLabel1->Text = "Write to Slave NYI";
+
+			 int reg =   Convert::ToInt32(Register->Text);
+
+			 int val;
+			 if( ! Int32::TryParse( Value->Text, val ) ) {
+				 toolStripStatusLabel1->Text = "Please specify Value to write";
+				 return;
+			 }
+			 theModBusSim.SendQueryRead(
+				 Convert::ToInt32(Station->Text),
+				 reg,
+				 val );
+			 DisplayMessageAndReply();
+
+
 		 }
 private: System::Void Value_TextChanged(System::Object^  sender, System::EventArgs^  e) {
 		 }
 private: System::Void TextBlockLength_TextChanged(System::Object^  sender, System::EventArgs^  e) {
 		 }
-};
+		 };
 }
 
