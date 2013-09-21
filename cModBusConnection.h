@@ -35,6 +35,7 @@ public:
 	virtual int Connect()							{ return 1; }		///< No connection from base class
 	virtual int Slave()								{ return 1; }		///< No slave simulator in base class
 	virtual bool IsOpened()							{ return false; }	///< base class cannot be opened
+	virtual void getConfig( std::wstring& config )	{ config.clear(); } ///< no configuration
 	virtual int SendData
 		( const unsigned char *buffer, int size )	{ return 0; }		///< base class cannot send data
 	virtual int WaitForData
@@ -42,9 +43,9 @@ public:
 	virtual int ReadData( void *, int )				{ return 0; }		///< base class connot read data
 	virtual int ReadDataWaiting( void )				{ return 0; }		///< never any data on base class
 
-	void setSerial()						{ myType = serial; }
-	void setTCP()							{ myType = tcp; }
-	virtual void setCOMPort( int i )		{ }
+	void setSerial()								{ myType = serial; }
+	void setTCP()									{ myType = tcp; }
+	virtual void setCOMPort( int i, int nBaud )		{ }
 
 	bool IsSerial()							{ return ( myType == serial ); }
 	bool IsTCP()							{ return ( myType == tcp ); }
@@ -108,7 +109,18 @@ public:
 		, myCOMPort( -1 )
 	{}
 
+	/**
+
+	Open the connection
+
+	*/
 	int Connect();
+
+	/*
+	get the connection configuration ( speed, stop bits etc )
+
+	*/
+	void getConfig(std::wstring& config_text )	{ mySerial.getConfig( config_text ); }
 
 	/**
 
@@ -167,11 +179,12 @@ public:
 		( const unsigned char *buffer, int size )
 											{ return mySerial.SendData( buffer, size ); }
 
-	void setCOMPort( int i )				{ myCOMPort = i; }
+	void setCOMPort( int i, int nBaud )				{ myCOMPort = i; myBaud = nBaud; }
 
 private:
 	raven::cSerial mySerial;
 	int myCOMPort;
+	int myBaud;
 
 };
 
@@ -188,8 +201,9 @@ public:
 	int Connect();
 	void setSerial();
 	void setTCP();
-	bool IsSerial()				{ return myConnection->IsSerial(); }
-	bool IsTCP()				{ return myConnection->IsTCP(); }
+	bool IsSerial()							{ return myConnection->IsSerial(); }
+	bool IsTCP()							{ return myConnection->IsTCP(); }
+	void getConfig( std::wstring& config )	{ myConnection->getConfig( config ); }
 
 	void SendQueryRead( int Station, int Register, int Length );
 	void SendQueryWrite( int Station, int Register, int Value );
@@ -204,7 +218,7 @@ public:
 	char * getData()						{ return (char*)myBuffer; }
 
 
-	void setCOMPort( int i )				{ myConnection->setCOMPort( i ); }
+	void setCOMPort( int i, int nBaud )		{ myConnection->setCOMPort( i, nBaud ); }
 	void setASCII()							{ myConnection->setASCII(); }
 	void setRTU()							{ myConnection->setRTU(); }
 	bool IsRTU()							{ return myConnection->IsRTU(); }

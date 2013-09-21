@@ -34,6 +34,8 @@ namespace simodbus {
 		Form1(void)
 		{
 			InitializeComponent();
+
+			SerialPortSpeed->SelectedIndex = 1;
 			
 		}
 
@@ -107,6 +109,12 @@ namespace simodbus {
 
 
 	private: System::Windows::Forms::Label^  label7;
+	private: System::Windows::Forms::ComboBox^  SerialPortSpeed;
+	private: System::Windows::Forms::Label^  labelPortSpeed;
+
+
+	private: System::Windows::Forms::ListBox^  listBox1;
+	private: System::Windows::Forms::Label^  label8;
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -159,6 +167,8 @@ namespace simodbus {
 			this->rbRTU = (gcnew System::Windows::Forms::RadioButton());
 			this->rbASCII = (gcnew System::Windows::Forms::RadioButton());
 			this->logWindow = (gcnew System::Windows::Forms::RichTextBox());
+			this->labelPortSpeed = (gcnew System::Windows::Forms::Label());
+			this->SerialPortSpeed = (gcnew System::Windows::Forms::ComboBox());
 			this->statusStrip->SuspendLayout();
 			this->groupBox1->SuspendLayout();
 			this->groupBox2->SuspendLayout();
@@ -347,7 +357,7 @@ namespace simodbus {
 			// 
 			// textBox2
 			// 
-			this->textBox2->Location = System::Drawing::Point(166, 52);
+			this->textBox2->Location = System::Drawing::Point(136, 51);
 			this->textBox2->Name = L"textBox2";
 			this->textBox2->Size = System::Drawing::Size(140, 20);
 			this->textBox2->TabIndex = 15;
@@ -355,7 +365,7 @@ namespace simodbus {
 			// label5
 			// 
 			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(121, 56);
+			this->label5->Location = System::Drawing::Point(91, 55);
 			this->label5->Name = L"label5";
 			this->label5->Size = System::Drawing::Size(17, 13);
 			this->label5->TabIndex = 14;
@@ -363,7 +373,7 @@ namespace simodbus {
 			// 
 			// COMPort
 			// 
-			this->COMPort->Location = System::Drawing::Point(166, 24);
+			this->COMPort->Location = System::Drawing::Point(125, 21);
 			this->COMPort->Name = L"COMPort";
 			this->COMPort->Size = System::Drawing::Size(44, 20);
 			this->COMPort->TabIndex = 13;
@@ -371,7 +381,7 @@ namespace simodbus {
 			// label6
 			// 
 			this->label6->AutoSize = true;
-			this->label6->Location = System::Drawing::Point(116, 25);
+			this->label6->Location = System::Drawing::Point(86, 29);
 			this->label6->Name = L"label6";
 			this->label6->Size = System::Drawing::Size(37, 13);
 			this->label6->TabIndex = 12;
@@ -389,6 +399,8 @@ namespace simodbus {
 			// 
 			// groupBox3
 			// 
+			this->groupBox3->Controls->Add(this->SerialPortSpeed);
+			this->groupBox3->Controls->Add(this->labelPortSpeed);
 			this->groupBox3->Controls->Add(this->textBox2);
 			this->groupBox3->Controls->Add(this->COMPort);
 			this->groupBox3->Controls->Add(this->rbSERIAL);
@@ -479,6 +491,24 @@ namespace simodbus {
 			this->logWindow->Size = System::Drawing::Size(298, 331);
 			this->logWindow->TabIndex = 19;
 			this->logWindow->Text = L"";
+			// 
+			// labelPortSpeed
+			// 
+			this->labelPortSpeed->AutoSize = true;
+			this->labelPortSpeed->Location = System::Drawing::Point(188, 28);
+			this->labelPortSpeed->Name = L"labelPortSpeed";
+			this->labelPortSpeed->Size = System::Drawing::Size(38, 13);
+			this->labelPortSpeed->TabIndex = 16;
+			this->labelPortSpeed->Text = L"Speed";
+			// 
+			// SerialPortSpeed
+			// 
+			this->SerialPortSpeed->FormattingEnabled = true;
+			this->SerialPortSpeed->Items->AddRange(gcnew cli::array< System::Object^  >(3) {L"4800", L"9600", L"19200"});
+			this->SerialPortSpeed->Location = System::Drawing::Point(232, 20);
+			this->SerialPortSpeed->Name = L"SerialPortSpeed";
+			this->SerialPortSpeed->Size = System::Drawing::Size(88, 21);
+			this->SerialPortSpeed->TabIndex = 17;
 			// 
 			// Form1
 			// 
@@ -610,7 +640,9 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 				 theModBusSim.setSerial();
 				 int p = -1;
 				 Int32::TryParse( COMPort->Text, p );
-				 theModBusSim.setCOMPort( p );
+				 int nBaud = 9600;
+				 Int32::TryParse( SerialPortSpeed->Text, nBaud );
+				 theModBusSim.setCOMPort( p, nBaud );
 			 } else if ( rbTCP->Checked ) {
 				 theModBusSim.setTCP();
 			 } else {
@@ -645,7 +677,10 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 					 return;
 				 }
 				 this->Text = "Simodbus ( Master )";
-				 toolStripStatusLabel1->Text = "Master simulator running";
+				 std::wstring config_string;
+				 theModBusSim.getConfig( config_string );
+				 toolStripStatusLabel1->Text = "Master simulator running @ " +
+					 gcnew String( config_string.c_str() );
 
 			 } else {
 				 return;

@@ -15,7 +15,7 @@ Features
 
 5. Option to use ASCII or RTU mode
 
-6. Able to configure serial port number
+6. Able to configure serial port number and speed.
 
 7. Able to configure TCP address and port number   ( NYI )
 

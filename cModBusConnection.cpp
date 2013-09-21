@@ -277,7 +277,7 @@ int cConnectionSerial::Connect()
 	/*
 	Open connection
 	*/
-	if( ! mySerial.Open( szPort ) ) {
+	if( ! mySerial.Open( szPort, myBaud ) ) {
 		myErrorMsg = (char * )mySerial.GetLastError();
 		return 1;
 	}
