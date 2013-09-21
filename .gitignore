@@ -10,3 +10,5 @@
 # output folders
 Debug/*
 Release/*
+bin/*
+

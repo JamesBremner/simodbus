@@ -26,7 +26,7 @@ Features
 10. Able to send a read query to a specified station and register block. 
     Values returned will be decoded and displayed.
     
-11. Able to send a write query to a specified station and register with a specified value.  ( NYI )
+11. Able to send a write query to a specified station and register with a specified value.
 
 12. Display log of all communications sent and received
 
