@@ -718,7 +718,7 @@ private: System::Void MQWrite_Click(System::Object^  sender, System::EventArgs^ 
 				 toolStripStatusLabel1->Text = "Please specify Value to write";
 				 return;
 			 }
-			 theModBusSim.SendQueryRead(
+			 theModBusSim.SendQueryWrite(
 				 Convert::ToInt32(Station->Text),
 				 reg,
 				 val );
