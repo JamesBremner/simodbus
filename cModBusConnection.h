@@ -223,7 +223,10 @@ public:
 	void setRTU()							{ myConnection->setRTU(); }
 	bool IsRTU()							{ return myConnection->IsRTU(); }
 
-	const char * GetLastError() { return myErrorMsg; }
+	void ClearSimulatedStationRegisters()	{ myStationMap.clear(); }
+	void AddSimulatedStationRegister( int station, int reg, int val );
+
+	const char * GetLastError()				{ return myErrorMsg; }
 
 private:
 	std::string myHumanReadableMessage;
@@ -231,6 +234,8 @@ private:
 	float myValue;
 	float myValueArray[255];
 	unsigned char myBuffer[1000];
+	typedef std::map < int, std::map< int, int > > stationmap_t;
+	stationmap_t myStationMap;
 	
 	cConnectionBase * myConnection;
 

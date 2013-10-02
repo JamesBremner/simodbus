@@ -352,12 +352,15 @@ int cModBusSim::Poll()
 			return 4;
 		}
 
+		int station = myBuffer[0];
 		int cmd = myBuffer[1];
 		int block = myBuffer[5];
 
 		// accept either a input or holding register read
 		// return same for both
 		if( cmd == 3 || cmd == 4 ) {
+
+			if( ! myStationMap.size() ) {
 
 			// for any read command
 			// return 1 for first register, 2 for second ...
@@ -372,6 +375,36 @@ int cModBusSim::Poll()
 			myBuffer[len+1] = 0xFF & crc;
 			len += 2;
 
+			} else {
+
+				// simulating particular stations
+				stationmap_t::iterator ps = myStationMap.find( station );
+				if( ps == myStationMap.end() ) {
+					// address not being simulated
+					myBuffer[1] += 0x80;
+					len -= 2;
+					unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
+					myBuffer[len] = crc >> 8;
+					myBuffer[len+1] = 0xFF & crc;
+					len += 2;
+				} else {
+					int value = 0;
+					std::map<int,int>::iterator pr = ps->second.find( myBuffer[3] );
+					if( pr == ps->second.end() ) {
+						// register not being simulated
+					} else {
+						value = pr->second;
+					}
+					myBuffer[3] = 0;
+					myBuffer[4] = value;
+					len = 3 + 2;
+					unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
+					myBuffer[len] = crc >> 8;
+					myBuffer[len+1] = 0xFF & crc;
+					len += 2;
+				}
+		
+			}
 
 		}
 
@@ -381,6 +414,18 @@ int cModBusSim::Poll()
 
 	return 0;
 }
+
+void cModBusSim::AddSimulatedStationRegister( int station, int reg, int val )
+{
+	stationmap_t::iterator ps = myStationMap.find( station );
+	if( ps == myStationMap.end() ) {
+		std::map< int, int > regmap;
+		regmap.insert( std::pair<int,int>(reg, val) );
+		myStationMap.insert( std::pair< int, std::map<int,int> >(station, regmap) );
+		return;
+	}
+}
+
 /**
 The Longitudinal Redundancy Check
 

@@ -6,4 +6,6 @@
 #include <Ws2tcpip.h>
 #include <string>
 
+#include <map>
+
 #include "serial.h"

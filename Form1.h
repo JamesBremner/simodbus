@@ -656,11 +656,15 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 			 }
 
 			 if( rbSTATIONS->Checked ) {
+				 
 				 // attempt connection as slave
 				 if( theModBusSim.Slave() != OK ) {
 					 toolStripStatusLabel1->Text = "Connection Failed";
 					 return;
 				 }
+
+				 SaveSimulatedStationRegisters();
+
 				 this->Text = "Simodbus ( Stations )";
 
 				 /* start timer for slave server
@@ -711,6 +715,17 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 
 		 }
 public:
+
+	void SaveSimulatedStationRegisters()
+	{
+		theModBusSim.ClearSimulatedStationRegisters();
+		for( int krow = 0; krow < dataGridView1->RowCount; krow++ ) {
+			int station = Convert::ToInt32( dataGridView1->Rows[ krow ]->Cells[0]->Value );
+			int reg = Convert::ToInt32( dataGridView1->Rows[ krow ]->Cells[1]->Value );
+			int val = Convert::ToInt32( dataGridView1->Rows[ krow ]->Cells[2]->Value );
+			theModBusSim.AddSimulatedStationRegister( station, reg, val );
+		}
+	}
 
 	void DisplayMessageAndReply(void)
 	{

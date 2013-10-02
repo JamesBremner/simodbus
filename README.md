@@ -21,7 +21,7 @@ Features
 
 8. All slaves are assumed to be on the same port
 
-9. Able to configure station numbers and register numbers that the slave will simulate.  ( NYI )
+9. Able to configure station numbers and register numbers that the slave will simulate.
 
 10. Able to send a read query to a specified station and register block. 
     Values returned will be decoded and displayed.
