@@ -662,8 +662,26 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 					 return;
 				 }
 				 this->Text = "Simodbus ( Stations )";
-				 // start timer for slave server
-				 timer1->Interval = 100;
+
+				 /* start timer for slave server
+
+				This is the polling interval in milliseconds
+				that controls how often the port is checked 
+				for a message from the master.
+
+				We want this to be short, so that the station is
+				responsive to master commands, but not so fast that we
+				consume all the CPU cycles.
+
+				25ms works well in my tests. ( == 40 Hz )
+
+				Do not attempt anything less than 2 ms when running under windows.
+				A real modbus station will poll much, much faster than this.
+
+				 */
+				 timer1->Interval = 25;
+
+
 				 timer1->Enabled = true;
 
 				 toolStripStatusLabel1->Text = "Station simulator running";
