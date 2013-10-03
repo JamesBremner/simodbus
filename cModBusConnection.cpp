@@ -354,6 +354,7 @@ int cModBusSim::Poll()
 
 		int station = myBuffer[0];
 		int cmd = myBuffer[1];
+		int reg = myBuffer[3];
 		int block = myBuffer[5];
 
 		// accept either a input or holding register read
@@ -383,26 +384,22 @@ int cModBusSim::Poll()
 					// address not being simulated
 					myBuffer[1] += 0x80;
 					len -= 2;
-					unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
-					myBuffer[len] = crc >> 8;
-					myBuffer[len+1] = 0xFF & crc;
-					len += 2;
 				} else {
 					int value = 0;
-					std::map<int,int>::iterator pr = ps->second.find( myBuffer[3] );
-					if( pr == ps->second.end() ) {
-						// register not being simulated
-					} else {
-						value = pr->second;
+					for( int kr = 0; kr < block; kr++ ) {
+						std::map<int,int>::iterator pr = ps->second.find( reg + kr );
+						if( pr == ps->second.end() ) {
+							// register not being simulated
+							value = 0;
+						} else {
+							value = pr->second;
+						}
+						myBuffer[3+kr*2] = 0;
+						myBuffer[4+kr*2] = value;
 					}
-					myBuffer[3] = 0;
-					myBuffer[4] = value;
-					len = 3 + 2;
-					unsigned short crc = CyclicalRedundancyCheck( myBuffer,len);
-					myBuffer[len] = crc >> 8;
-					myBuffer[len+1] = 0xFF & crc;
-					len += 2;
+					len = 3 + 2 * block;
 				}
+				CRCAdd( myBuffer,len); 
 		
 			}
 
@@ -414,16 +411,41 @@ int cModBusSim::Poll()
 
 	return 0;
 }
+/**
 
+  Add station/register simulation
+
+  @param[in] station
+  @param[in] reg
+  @param[in] val  The value that will be returned if this station/register is read
+
+  The configuration is stored in the station map attribute
+
+*/
 void cModBusSim::AddSimulatedStationRegister( int station, int reg, int val )
 {
 	stationmap_t::iterator ps = myStationMap.find( station );
 	if( ps == myStationMap.end() ) {
+		// new station
 		std::map< int, int > regmap;
 		regmap.insert( std::pair<int,int>(reg, val) );
 		myStationMap.insert( std::pair< int, std::map<int,int> >(station, regmap) );
-		return;
+	} else {
+		std::map< int, int >::iterator pr = ps->second.find( reg );
+		if( pr == ps->second.end() ) {
+			// new register
+			ps->second.insert( std::pair<int,int>(reg,val) );
+		} else {
+			pr->second = val;
+		}
 	}
+}
+void cModBusSim::CRCAdd( unsigned char* buf, int& len )
+{
+	unsigned short crc = CyclicalRedundancyCheck( buf,len);
+	buf[len] = crc >> 8;
+	buf[len+1] = 0xFF & crc;
+	len += 2;
 }
 
 /**

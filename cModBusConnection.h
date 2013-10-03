@@ -247,6 +247,7 @@ private:
 		unsigned char * msg, int len);
 	unsigned short CyclicalRedundancyCheck(
 		unsigned char * msg, int len );
+	void CRCAdd( unsigned char* buf, int& len );
 };
 
 extern cModBusSim theModBusSim;
