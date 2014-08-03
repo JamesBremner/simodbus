@@ -115,6 +115,8 @@ namespace simodbus {
 
 	private: System::Windows::Forms::ListBox^  listBox1;
 	private: System::Windows::Forms::Label^  label8;
+	private: System::Windows::Forms::RadioButton^  rbSimBoth;
+
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -149,6 +151,7 @@ namespace simodbus {
 			this->TextBlockLength = (gcnew System::Windows::Forms::TextBox());
 			this->label7 = (gcnew System::Windows::Forms::Label());
 			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
+			this->rbSimBoth = (gcnew System::Windows::Forms::RadioButton());
 			this->RUN = (gcnew System::Windows::Forms::Button());
 			this->rbSTATIONS = (gcnew System::Windows::Forms::RadioButton());
 			this->rbMASTER = (gcnew System::Windows::Forms::RadioButton());
@@ -158,6 +161,8 @@ namespace simodbus {
 			this->label6 = (gcnew System::Windows::Forms::Label());
 			this->rbTCP = (gcnew System::Windows::Forms::RadioButton());
 			this->groupBox3 = (gcnew System::Windows::Forms::GroupBox());
+			this->SerialPortSpeed = (gcnew System::Windows::Forms::ComboBox());
+			this->labelPortSpeed = (gcnew System::Windows::Forms::Label());
 			this->rbSERIAL = (gcnew System::Windows::Forms::RadioButton());
 			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
 			this->dataGridViewTextBoxColumn1 = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
@@ -167,8 +172,6 @@ namespace simodbus {
 			this->rbRTU = (gcnew System::Windows::Forms::RadioButton());
 			this->rbASCII = (gcnew System::Windows::Forms::RadioButton());
 			this->logWindow = (gcnew System::Windows::Forms::RichTextBox());
-			this->labelPortSpeed = (gcnew System::Windows::Forms::Label());
-			this->SerialPortSpeed = (gcnew System::Windows::Forms::ComboBox());
 			this->statusStrip->SuspendLayout();
 			this->groupBox1->SuspendLayout();
 			this->groupBox2->SuspendLayout();
@@ -313,6 +316,7 @@ namespace simodbus {
 			// 
 			// groupBox2
 			// 
+			this->groupBox2->Controls->Add(this->rbSimBoth);
 			this->groupBox2->Controls->Add(this->RUN);
 			this->groupBox2->Controls->Add(this->rbSTATIONS);
 			this->groupBox2->Controls->Add(this->rbMASTER);
@@ -322,6 +326,17 @@ namespace simodbus {
 			this->groupBox2->TabIndex = 13;
 			this->groupBox2->TabStop = false;
 			this->groupBox2->Text = L"Simulate";
+			// 
+			// rbSimBoth
+			// 
+			this->rbSimBoth->AutoSize = true;
+			this->rbSimBoth->Location = System::Drawing::Point(144, 18);
+			this->rbSimBoth->Name = L"rbSimBoth";
+			this->rbSimBoth->Size = System::Drawing::Size(47, 17);
+			this->rbSimBoth->TabIndex = 3;
+			this->rbSimBoth->TabStop = true;
+			this->rbSimBoth->Text = L"Both";
+			this->rbSimBoth->UseVisualStyleBackColor = true;
 			// 
 			// RUN
 			// 
@@ -336,7 +351,7 @@ namespace simodbus {
 			// rbSTATIONS
 			// 
 			this->rbSTATIONS->AutoSize = true;
-			this->rbSTATIONS->Location = System::Drawing::Point(88, 20);
+			this->rbSTATIONS->Location = System::Drawing::Point(68, 19);
 			this->rbSTATIONS->Name = L"rbSTATIONS";
 			this->rbSTATIONS->Size = System::Drawing::Size(63, 17);
 			this->rbSTATIONS->TabIndex = 1;
@@ -347,7 +362,7 @@ namespace simodbus {
 			// rbMASTER
 			// 
 			this->rbMASTER->AutoSize = true;
-			this->rbMASTER->Location = System::Drawing::Point(24, 20);
+			this->rbMASTER->Location = System::Drawing::Point(9, 20);
 			this->rbMASTER->Name = L"rbMASTER";
 			this->rbMASTER->Size = System::Drawing::Size(57, 17);
 			this->rbMASTER->TabIndex = 0;
@@ -413,6 +428,24 @@ namespace simodbus {
 			this->groupBox3->TabIndex = 16;
 			this->groupBox3->TabStop = false;
 			this->groupBox3->Text = L"Connection";
+			// 
+			// SerialPortSpeed
+			// 
+			this->SerialPortSpeed->FormattingEnabled = true;
+			this->SerialPortSpeed->Items->AddRange(gcnew cli::array< System::Object^  >(3) {L"4800", L"9600", L"19200"});
+			this->SerialPortSpeed->Location = System::Drawing::Point(232, 20);
+			this->SerialPortSpeed->Name = L"SerialPortSpeed";
+			this->SerialPortSpeed->Size = System::Drawing::Size(88, 21);
+			this->SerialPortSpeed->TabIndex = 17;
+			// 
+			// labelPortSpeed
+			// 
+			this->labelPortSpeed->AutoSize = true;
+			this->labelPortSpeed->Location = System::Drawing::Point(188, 28);
+			this->labelPortSpeed->Name = L"labelPortSpeed";
+			this->labelPortSpeed->Size = System::Drawing::Size(38, 13);
+			this->labelPortSpeed->TabIndex = 16;
+			this->labelPortSpeed->Text = L"Speed";
 			// 
 			// rbSERIAL
 			// 
@@ -491,24 +524,6 @@ namespace simodbus {
 			this->logWindow->Size = System::Drawing::Size(298, 331);
 			this->logWindow->TabIndex = 19;
 			this->logWindow->Text = L"";
-			// 
-			// labelPortSpeed
-			// 
-			this->labelPortSpeed->AutoSize = true;
-			this->labelPortSpeed->Location = System::Drawing::Point(188, 28);
-			this->labelPortSpeed->Name = L"labelPortSpeed";
-			this->labelPortSpeed->Size = System::Drawing::Size(38, 13);
-			this->labelPortSpeed->TabIndex = 16;
-			this->labelPortSpeed->Text = L"Speed";
-			// 
-			// SerialPortSpeed
-			// 
-			this->SerialPortSpeed->FormattingEnabled = true;
-			this->SerialPortSpeed->Items->AddRange(gcnew cli::array< System::Object^  >(3) {L"4800", L"9600", L"19200"});
-			this->SerialPortSpeed->Location = System::Drawing::Point(232, 20);
-			this->SerialPortSpeed->Name = L"SerialPortSpeed";
-			this->SerialPortSpeed->Size = System::Drawing::Size(88, 21);
-			this->SerialPortSpeed->TabIndex = 17;
 			// 
 			// Form1
 			// 
@@ -595,6 +610,7 @@ namespace simodbus {
 					 Convert::ToInt32(Station->Text),
 					 reg,
 					 BlockLength );
+
 				 DisplayMessageAndReply();
 
 				 array<String^>^ row = gcnew array<String^>(3);
@@ -631,7 +647,11 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 
 			 // check configuration
 			 if( rbSTATIONS->Checked ) {
+				 theModBusSim.setSimMode( cModBusSim::slave );
 			 } else if ( rbMASTER->Checked ) {
+				 theModBusSim.setSimMode( cModBusSim::master );
+			 } else if ( rbSimBoth->Checked ) {
+ 				 theModBusSim.setSimMode( cModBusSim::both );
 			 } else {
 				 toolStripStatusLabel1->Text = "Please select master or stations simulator";
 				 return;
@@ -692,7 +712,7 @@ private: System::Void RUN_Click(System::Object^  sender, System::EventArgs^  e) 
 				 MQRead->Enabled = false;
 				 MQWrite->Enabled = false;
 
-			 } else if ( rbMASTER->Checked ) {
+			 } else if ( rbMASTER->Checked || rbSimBoth->Checked ) {
 				 // Attempt connection as master
 				 if( theModBusSim.Connect() != OK ) {
 					 toolStripStatusLabel1->Text = "Connection Failed" + gcnew String(theModBusSim.GetLastError());
@@ -755,6 +775,7 @@ private: System::Void MQWrite_Click(System::Object^  sender, System::EventArgs^ 
 				 Convert::ToInt32(Station->Text),
 				 reg,
 				 val );
+
 			 DisplayMessageAndReply();
 
 
@@ -763,6 +784,7 @@ private: System::Void Value_TextChanged(System::Object^  sender, System::EventAr
 		 }
 private: System::Void TextBlockLength_TextChanged(System::Object^  sender, System::EventArgs^  e) {
 		 }
-		 };
+
+};
 }
 

@@ -108,6 +108,17 @@ void cModBusSim::SendQueryRead(
 			msglen );
 
 		Sleep(300);
+
+		if( mySimMode == both ) {
+
+			// simulating both the master and the slave
+			// so now send the slave's response
+			SendStationReplyToBuffer( buf, msglen );
+
+		} else {
+
+			// wait for response from slave on connection
+
 		if( ! myConnection->WaitForData(
 			7,
 			6000 ) ) {
@@ -118,6 +129,9 @@ void cModBusSim::SendQueryRead(
 		msglen = myConnection->ReadData(
 			buf,
 			999);
+
+		}
+
 		myHumanReadableReply = MakeHumanReadable(buf,msglen);
 
 		// Decode values returned
@@ -411,6 +425,27 @@ int cModBusSim::Poll()
 
 	return 0;
 }
+
+void cModBusSim::SendStationReplyToBuffer( unsigned char* buf, int len )
+{
+		int block = buf[5];
+		// for any read command
+			// return 1 for first register, 2 for second ...
+			buf[2] = 2 * block;
+			for( int kr = 0; kr < block; kr++ ) {
+				buf[3+kr*2] = 0;
+				buf[4+kr*2] = kr+1;
+			}
+			len = 3 + 2 * block;
+			unsigned short crc = CyclicalRedundancyCheck( buf,len);
+			buf[len] = crc >> 8;
+			buf[len+1] = 0xFF & crc;
+			len += 2;
+
+	myConnection->SendData(buf,len);
+
+}
+
 /**
 
   Add station/register simulation

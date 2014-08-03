@@ -9,7 +9,7 @@ Features
 
 2. Coded in C++ using .NET 
 
-3. Option to simulate a master or a slave.
+3. Option to simulate a master or a slave or both.
 
 4. Option to use serial port or TCP
 

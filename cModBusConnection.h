@@ -198,6 +198,14 @@ public:
 	cModBusSim(void);
 	~cModBusSim(void);
 
+	enum eSimMode {
+		none,
+		slave,
+		master,
+		both
+	} mySimMode;
+	void setSimMode( eSimMode m )			{ mySimMode = m; }
+
 	int Connect();
 	void setSerial();
 	void setTCP();
@@ -214,6 +222,7 @@ public:
 	int Slave();
 	
 	int Poll();
+
 
 	char * getData()						{ return (char*)myBuffer; }
 
@@ -240,6 +249,9 @@ private:
 	cConnectionBase * myConnection;
 
 	char * myErrorMsg;
+
+	
+	void SendStationReplyToBuffer( unsigned char* buf, int len);
 
 	void Server();
 	std::string MakeHumanReadable( unsigned char * msg, int len );
