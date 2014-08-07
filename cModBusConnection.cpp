@@ -412,6 +412,7 @@ int cModBusSim::Poll()
 						myBuffer[4+kr*2] = value;
 					}
 					len = 3 + 2 * block;
+					myBuffer[2] = 2 * block;
 				}
 				CRCAdd( myBuffer,len); 
 		
